@@ -14,7 +14,7 @@
  *   • student       → Registered in the system so their ID card
  *                     data can be matched during verification.
  *
- * KEY DESIGN DECISIONS:
+ls
  *   • Password is pre-hashed via a Mongoose pre-save hook using
  *     bcryptjs so controllers never touch raw passwords.
  *   • matchPassword() method lives on the document so login logic

@@ -252,23 +252,14 @@ a:hover { color: var(--primary); }
   background-clip: text;
 }
 
-/* ── Animated Gradient Background ── */
+/* ── Simple Plain Background ── */
 .gradient-bg {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-surface) 100%);
+  background-color: #0f0f15;
   position: relative;
 }
 
 .gradient-bg::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(79, 70, 229, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%);
-  pointer-events: none;
+  display: none;
 }
 
 /* ── Loader Animation ── */

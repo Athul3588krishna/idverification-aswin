@@ -89,11 +89,6 @@ const Login = () => {
 
   return (
     <div className="login-page gradient-bg">
-      {/* Decorative floating orbs */}
-      <div className="login-orb orb-1" />
-      <div className="login-orb orb-2" />
-      <div className="login-orb orb-3" />
-
       <div className="login-container animate-fade-in-up">
         {/* ── Brand Header ── */}
         <div className="login-brand">
@@ -226,37 +221,7 @@ const Login = () => {
           overflow: hidden;
         }
 
-        /* Floating decorative orbs */
-        .login-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          pointer-events: none;
-          opacity: 0.35;
-        }
-        .orb-1 {
-          width: 400px; height: 400px;
-          background: radial-gradient(circle, #4f46e5, transparent);
-          top: -100px; left: -100px;
-          animation: orbFloat 8s ease-in-out infinite;
-        }
-        .orb-2 {
-          width: 300px; height: 300px;
-          background: radial-gradient(circle, #7c3aed, transparent);
-          bottom: -80px; right: -60px;
-          animation: orbFloat 10s ease-in-out infinite reverse;
-        }
-        .orb-3 {
-          width: 200px; height: 200px;
-          background: radial-gradient(circle, #3b82f6, transparent);
-          top: 50%; left: 60%;
-          animation: orbFloat 12s ease-in-out infinite 2s;
-        }
-        @keyframes orbFloat {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33%       { transform: translate(20px, -30px) scale(1.05); }
-          66%       { transform: translate(-15px, 20px) scale(0.95); }
-        }
+
 
         .login-container {
           width: 100%;
