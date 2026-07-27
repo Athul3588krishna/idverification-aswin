@@ -27,7 +27,8 @@ import PrivateRoute from "./components/common/PrivateRoute";
 
 // Pages
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
+import StudentLogin from "./pages/StudentLogin";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
@@ -43,8 +44,10 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/student/login" element={<StudentLogin />} />
+          <Route path="/student/register" element={<Register />} />
+          <Route path="/login" element={<AdminLogin />} /> {/* Fallback/shortcut */}
 
           {/* Protected Routes */}
           <Route

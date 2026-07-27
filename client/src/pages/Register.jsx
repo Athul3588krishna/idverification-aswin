@@ -69,7 +69,7 @@ const Register = () => {
       });
 
       toast.success("Registration successful! You can now log in. 🎉");
-      navigate("/login");
+      navigate("/student/login");
     } catch (err) {
       const message = err.response?.data?.message || "Registration failed. Please try again.";
       toast.error(message);
@@ -93,7 +93,7 @@ const Register = () => {
         {/* Card */}
         <div className="login-card glass-card p-4">
           <div className="d-flex align-items-center mb-4">
-            <Link to="/login" className="btn btn-link text-white p-0 me-3">
+            <Link to="/student/login" className="btn btn-link text-white p-0 me-3">
               <FiArrowLeft size={20} />
             </Link>
             <div>
@@ -337,7 +337,7 @@ const Register = () => {
 
           <div className="mt-4 text-center">
             <span className="text-white-50">Already have an account? </span>
-            <Link to="/login" className="auth-link">Sign In</Link>
+            <Link to="/student/login" className="auth-link">Sign In</Link>
           </div>
         </div>
       </div>

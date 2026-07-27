@@ -63,9 +63,14 @@ const Home = () => {
                 Go to Dashboard <FiArrowRight size={16} />
               </Link>
             ) : (
-              <Link to="/login" className="btn btn-primary-custom d-flex align-items-center gap-2">
-                <FiLock size={16} /> Access System Portal
-              </Link>
+              <>
+                <Link to="/student/login" className="btn btn-outline-secondary d-flex align-items-center gap-2 text-white" style={{ borderColor: "var(--border-color)" }}>
+                  Candidate Portal
+                </Link>
+                <Link to="/admin/login" className="btn btn-primary-custom d-flex align-items-center gap-2">
+                  <FiLock size={16} /> Staff Portal
+                </Link>
+              </>
             )}
           </div>
         </div>
@@ -102,9 +107,17 @@ const Home = () => {
                 Open Security Dashboard <FiArrowRight size={18} />
               </Link>
             ) : (
-              <Link to="/login" className="btn btn-primary-custom px-4 py-3 text-lg d-flex align-items-center gap-2">
-                <FiLock size={18} /> Staff / Admin Login
-              </Link>
+              <>
+                <Link to="/student/login" className="btn btn-primary-custom px-4 py-3 text-lg d-flex align-items-center gap-2">
+                  <FiUserCheck size={18} /> Candidate Portal
+                </Link>
+                <Link to="/admin/login" className="btn btn-outline-secondary px-4 py-3 text-lg d-flex align-items-center gap-2" style={{
+                  borderColor: "var(--border-color)",
+                  color: "var(--text-primary)"
+                }}>
+                  <FiLock size={18} /> Staff / Admin Portal
+                </Link>
+              </>
             )}
             <a href="#how-it-works" className="btn btn-outline-secondary px-4 py-3 text-lg" style={{
               borderColor: "var(--border-color)",

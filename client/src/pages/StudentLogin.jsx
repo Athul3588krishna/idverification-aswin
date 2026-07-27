@@ -1,25 +1,8 @@
 /**
- * pages/Login.jsx
+ * pages/StudentLogin.jsx
  * ═══════════════════════════════════════════════════════════════
  * WHAT THIS FILE DOES:
- *   The public login page — the first screen any user sees.
- *   Handles login for all three roles (admin, security_staff,
- *   student) from one unified form.
- *
- * FLOW:
- *   1. User enters email + password
- *   2. Submit calls loginAPI()
- *   3. On success: token + user stored via AuthContext.login()
- *   4. User redirected to /dashboard
- *   5. On error: toast notification shown
- *
- * UI FEATURES:
- *   • Animated gradient background with floating orbs
- *   • Glassmorphism login card
- *   • Password show/hide toggle
- *   • Loading spinner on submit
- *   • Role badge showing which default credentials to use
- *   • Redirects to /dashboard if already logged in
+ *   Portal login for exam student candidates.
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -27,32 +10,29 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
-
 import useAuth from "../hooks/useAuth";
 import { loginAPI } from "../api/authAPI";
 
-const Login = () => {
-  const navigate  = useNavigate();
+const StudentLogin = () => {
+  const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
 
   // Form state
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading]       = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // ── Redirect if already logged in ──
+  // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
-  // ── Handle form field changes ──
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ── Handle form submission ──
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,82 +44,66 @@ const Login = () => {
     setIsLoading(true);
     try {
       const data = await loginAPI({
-        email:    formData.email.trim().toLowerCase(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
-      // Store token + user in context and localStorage
-      login(data.user, data.token);
+      if (data.user.role !== "student") {
+        toast.error("Staff must use the Staff Login Portal!");
+        setIsLoading(false);
+        return;
+      }
 
-      toast.success(`Welcome back, ${data.user.name}! 🎉`);
+      login(data.user, data.token);
+      toast.success(`Welcome, ${data.user.name}! 📚`);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      const message =
-        err.response?.data?.message || "Login failed. Please try again.";
-      toast.error(message);
+      toast.error(err.response?.data?.message || "Login failed. Please check credentials.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── Quick-fill demo credentials ──
-  const fillDemo = (email, password) => {
-    setFormData({ email, password });
-  };
-
   return (
     <div className="login-page gradient-bg">
       <div className="login-container animate-fade-in-up">
-        {/* ── Brand Header ── */}
+        {/* Brand Header */}
         <div className="login-brand">
           <div className="brand-icon">
             <FiShield size={36} />
           </div>
           <h1 className="brand-title">ExamShield</h1>
-          <p className="brand-subtitle">
-            OCR-Based Identity Verification System
-          </p>
+          <p className="brand-subtitle">Candidate Verification System</p>
         </div>
 
-        {/* ── Login Card ── */}
+        {/* Login Card */}
         <div className="login-card glass-card">
-          <h2 className="login-heading">Welcome Back</h2>
-          <p className="login-subheading">Sign in to your account</p>
+          <h2 className="login-heading">Candidate Login</h2>
+          <p className="login-subheading">Sign in to view your entrance exam hall ticket</p>
 
           <form onSubmit={handleSubmit} noValidate>
-            {/* ── Email Field ── */}
             <div className="form-group-custom">
-              <label htmlFor="email" className="form-label-custom">
-                Email Address
-              </label>
+              <label htmlFor="email" className="form-label-custom">Registered Email</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <FiMail size={16} />
-                </span>
+                <span className="input-icon"><FiMail size={16} /></span>
                 <input
                   id="email"
                   type="email"
                   name="email"
                   className="form-control-custom with-icon"
-                  placeholder="admin@examshield.com"
+                  placeholder="athul@examshield.com"
                   value={formData.email}
                   onChange={handleChange}
-                  autoComplete="email"
                   disabled={isLoading}
                   required
                 />
               </div>
             </div>
 
-            {/* ── Password Field ── */}
             <div className="form-group-custom">
-              <label htmlFor="password" className="form-label-custom">
-                Password
-              </label>
+              <label htmlFor="password" className="form-label-custom">Password</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <FiLock size={16} />
-                </span>
+                <span className="input-icon"><FiLock size={16} /></span>
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -148,7 +112,6 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
-                  autoComplete="current-password"
                   disabled={isLoading}
                   required
                 />
@@ -156,52 +119,45 @@ const Login = () => {
                   type="button"
                   className="input-action-btn"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
               </div>
             </div>
 
-            {/* ── Submit Button ── */}
-            <button
-              id="login-submit-btn"
-              type="submit"
-              className="btn-login"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
+            <button type="submit" className="btn-login" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Login Portal"}
             </button>
           </form>
+
           <div className="mt-3 text-center">
             <span className="text-white-50 small">New candidate? </span>
-            <Link to="/register" className="auth-link small" style={{ color: "#818cf8", textDecoration: "none", fontWeight: "600" }}>Register Here</Link>
+            <Link to="/student/register" className="auth-link small" style={{ color: "#818cf8", textDecoration: "none", fontWeight: "600" }}>Register Here</Link>
+          </div>
+
+          {/* Quick-fill section */}
+          <div className="mt-4 border-top border-secondary pt-3 text-center">
+            <small className="text-white-50 d-block mb-2">QUICK FILL DEMO CREDENTIALS</small>
+            <button
+              className="btn btn-sm btn-outline-secondary text-white-50 w-100"
+              onClick={() => setFormData({ email: "athul@examshield.com", password: "Student@123" })}
+            >
+              Demo Student (ATHUL KRISHNA)
+            </button>
           </div>
         </div>
 
-        {/* ── Footer / Back to Home ── */}
+        {/* Footer */}
         <div className="text-center">
           <Link to="/" className="text-secondary small d-inline-flex align-items-center gap-1 mb-2" style={{ textDecoration: "none" }}>
             ← Back to System Home
           </Link>
           <p className="login-footer">
-            ExamShield Security Portal &copy; {new Date().getFullYear()}
+            ExamShield Student Portal &copy; {new Date().getFullYear()}
           </p>
         </div>
       </div>
 
-      {/* ── Login Page CSS (scoped via className) ── */}
       <style>{`
         .login-page {
           min-height: 100vh;
@@ -212,9 +168,6 @@ const Login = () => {
           position: relative;
           overflow: hidden;
         }
-
-
-
         .login-container {
           width: 100%;
           max-width: 420px;
@@ -224,8 +177,6 @@ const Login = () => {
           align-items: center;
           gap: 1.5rem;
         }
-
-        /* Brand section */
         .login-brand {
           text-align: center;
           display: flex;
@@ -237,7 +188,7 @@ const Login = () => {
           width: 72px; height: 72px;
           background: linear-gradient(135deg, #4f46e5, #7c3aed);
           border-radius: 20px;
-          display: flex; align-items: center; justify-content: center;
+          display: flex align-items: center; justify-content: center;
           color: #fff;
           box-shadow: 0 8px 32px rgba(79,70,229,0.4);
           margin-bottom: 0.25rem;
@@ -257,31 +208,24 @@ const Login = () => {
           letter-spacing: 0.04em;
           margin: 0;
         }
-
-        /* Card */
         .login-card {
           width: 100%;
           padding: 2rem;
           border-radius: 20px;
-          background: rgba(255,255,255,0.05);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .login-heading {
           font-size: 1.5rem;
           font-weight: 700;
-          margin-bottom: 0.25rem;
           color: var(--text-primary);
+          margin-bottom: 0.25rem;
+          text-align: center;
         }
         .login-subheading {
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           color: var(--text-muted);
           margin-bottom: 1.75rem;
+          text-align: center;
         }
-
-        /* Form */
         .form-group-custom {
           margin-bottom: 1.25rem;
         }
@@ -289,10 +233,9 @@ const Login = () => {
           display: block;
           font-size: 0.8rem;
           font-weight: 600;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
           color: var(--text-secondary);
           margin-bottom: 0.5rem;
+          letter-spacing: 0.02em;
         }
         .input-wrapper {
           position: relative;
@@ -314,8 +257,8 @@ const Login = () => {
           border-radius: 10px;
           padding: 0.75rem 1rem;
           font-size: 0.9rem;
-          transition: border-color 0.2s, box-shadow 0.2s;
           outline: none;
+          transition: all 0.2s;
         }
         .form-control-custom.with-icon {
           padding-left: 2.75rem;
@@ -328,13 +271,6 @@ const Login = () => {
           box-shadow: 0 0 0 3px rgba(79,70,229,0.25);
           background: rgba(255,255,255,0.08);
         }
-        .form-control-custom::placeholder {
-          color: var(--text-muted);
-        }
-        .form-control-custom:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
         .input-action-btn {
           position: absolute;
           right: 12px;
@@ -344,16 +280,7 @@ const Login = () => {
           border: none;
           color: var(--text-muted);
           cursor: pointer;
-          padding: 0;
-          display: flex;
-          align-items: center;
-          transition: color 0.2s;
         }
-        .input-action-btn:hover {
-          color: var(--text-primary);
-        }
-
-        /* Submit Button */
         .btn-login {
           width: 100%;
           padding: 0.85rem;
@@ -363,83 +290,10 @@ const Login = () => {
           color: #fff;
           font-size: 0.95rem;
           font-weight: 700;
-          letter-spacing: 0.03em;
           cursor: pointer;
           margin-top: 0.5rem;
-          transition: all 0.25s;
           box-shadow: 0 4px 20px rgba(79,70,229,0.35);
-          display: flex;
-          align-items: center;
-          justify-content: center;
         }
-        .btn-login:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(79,70,229,0.5);
-        }
-        .btn-login:active:not(:disabled) { transform: translateY(0); }
-        .btn-login:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        /* Demo section */
-        .demo-section {
-          margin-top: 1.75rem;
-          padding-top: 1.25rem;
-          border-top: 1px solid rgba(255,255,255,0.07);
-        }
-        .demo-title {
-          font-size: 0.72rem;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
-          margin-bottom: 0.75rem;
-          text-align: center;
-        }
-        .demo-pills {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .demo-pill {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 8px;
-          padding: 0.6rem 1rem;
-          color: var(--text-secondary);
-          font-size: 0.82rem;
-          cursor: pointer;
-          text-align: left;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          transition: all 0.2s;
-        }
-        .demo-pill:hover {
-          background: rgba(79,70,229,0.12);
-          border-color: rgba(79,70,229,0.3);
-          color: var(--text-primary);
-        }
-        .demo-role {
-          font-size: 0.68rem;
-          font-weight: 700;
-          padding: 0.15rem 0.5rem;
-          border-radius: 4px;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-        }
-        .demo-role.admin { background: rgba(79,70,229,0.2); color: #818cf8; }
-        .demo-role.staff { background: rgba(16,185,129,0.2); color: #34d399; }
-        .demo-role.student { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .demo-hint {
-          font-size: 0.72rem;
-          color: var(--text-muted);
-          text-align: center;
-          margin-top: 0.5rem;
-          margin-bottom: 0;
-        }
-
-        /* Footer */
         .login-footer {
           font-size: 0.75rem;
           color: var(--text-muted);
@@ -451,4 +305,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default StudentLogin;
