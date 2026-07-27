@@ -119,3 +119,14 @@ export const deleteUserAPI = async (id) => {
   const { data } = await axiosInstance.delete(`/auth/users/${id}`);
   return data;
 };
+
+/**
+ * studentRegisterAPI
+ * POST /api/auth/student-register  (Public)
+ * @param {Object} userData
+ * @returns {{ success, user, message }}
+ */
+export const studentRegisterAPI = async (userData) => {
+  const { data } = await axiosInstance.post("/auth/student-register", userData);
+  return data;
+};

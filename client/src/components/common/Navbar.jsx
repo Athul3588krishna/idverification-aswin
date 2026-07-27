@@ -24,7 +24,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   };
 
   // Helper function to return the correct class based on user role

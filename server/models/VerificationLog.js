@@ -104,6 +104,16 @@ verificationLogSchema.index({ verifiedBy: 1 });
 verificationLogSchema.index({ student: 1 });
 verificationLogSchema.index({ createdAt: -1 }); // Default sort order (newest log first)
 
-const VerificationLog = mongoose.model("VerificationLog", verificationLogSchema);
+const VerificationLogSchemaModel = mongoose.model("VerificationLog", verificationLogSchema);
 
-module.exports = VerificationLog;
+const ProxyModel = new Proxy(VerificationLogSchemaModel, {
+  get: (target, prop) => {
+    const actualModel = global.useMockDB
+      ? require("../utils/mockDbHelper").MockVerificationLog
+      : VerificationLogSchemaModel;
+    const val = actualModel[prop];
+    return typeof val === "function" ? val.bind(actualModel) : val;
+  }
+});
+
+module.exports = ProxyModel;

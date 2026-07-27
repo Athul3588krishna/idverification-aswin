@@ -4,21 +4,11 @@
  * WHAT THIS FILE DOES:
  *   Admin-only candidate registration form.
  *   Provides the frontend form to create user credentials and
- *   student profile details in a single submission.
- *
- * FORM FIELDS:
- *   • Account Details: Full Name, Email, Password, Phone Number.
- *   • Profile Details: Roll Number, Course Name, Semester, Department, Exam Venue Center, Admission Year.
- *
- * FLOW:
- *   1. Admin completes form.
- *   2. Submit makes an authorized request to POST /api/auth/register.
- *   3. Toast displays success/error notification.
- *   4. Redirects to student list on success.
+ *   student profile details (DOB, ID Number, Exam Details) in a single submission.
  * ═══════════════════════════════════════════════════════════════
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FiUserPlus, FiArrowLeft, FiInfo, FiKey } from "react-icons/fi";
@@ -34,14 +24,34 @@ const AddStudent = () => {
     email: "",
     password: "",
     phone: "",
-    role: "student", // default role is student
+    role: "student",
     rollNumber: "",
-    course: "",
+    course: "MCA",
     semester: 1,
-    department: "",
-    examCenter: "",
+    department: "Computer Applications",
+    examCenter: "Hall A - Room 102",
     admissionYear: new Date().getFullYear(),
+    dob: "",
+    idNumber: "",
+    examSubject: "Entrance Examination 2026",
+    examDate: "2026-08-10",
+    examTime: "10:00 AM - 1:00 PM"
   });
+
+  // Load configured default exam settings from localStorage on mount
+  useEffect(() => {
+    const config = localStorage.getItem("examshield_exam_config");
+    if (config) {
+      const parsed = JSON.parse(config);
+      setFormData((prev) => ({
+        ...prev,
+        examSubject: parsed.subject || prev.examSubject,
+        examDate: parsed.date || prev.examDate,
+        examTime: parsed.time || prev.examTime,
+        examCenter: parsed.center || prev.examCenter,
+      }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,15 +74,22 @@ const AddStudent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic Validation
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.rollNumber.trim() || !formData.course.trim()) {
-      toast.error("Please fill in all mandatory fields (Name, Email, Password, Roll Number, Course)");
+    const { name, email, password, rollNumber, course, dob, idNumber } = formData;
+
+    // Validation
+    if (!name.trim() || !email.trim() || !password.trim() || !rollNumber.trim() || !course.trim() || !dob || !idNumber.trim()) {
+      toast.error("Please fill in all mandatory fields (marked with *)");
       return;
     }
 
     setLoading(true);
     try {
-      await registerUserAPI(formData);
+      await registerUserAPI({
+        ...formData,
+        email: email.trim().toLowerCase(),
+        rollNumber: rollNumber.trim().toUpperCase(),
+        idNumber: idNumber.trim()
+      });
       toast.success("Student registered successfully! 🎉");
       navigate("/students");
     } catch (err) {
@@ -96,6 +113,7 @@ const AddStudent = () => {
               className="btn btn-outline-secondary p-2 d-flex align-items-center justify-content-center rounded-circle"
               style={{ width: "40px", height: "40px", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
               title="Go Back"
+              disabled={loading}
             >
               <FiArrowLeft size={18} />
             </button>
@@ -103,7 +121,7 @@ const AddStudent = () => {
               <h2 className="mb-0" style={{ fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>
                 Register Student
               </h2>
-              <p className="text-secondary mb-0">Create candidate account and register academic details</p>
+              <p className="text-secondary mb-0">Create candidate account and register academic/verification details</p>
             </div>
           </div>
 
@@ -120,7 +138,7 @@ const AddStudent = () => {
 
               {/* Candidate Full Name */}
               <div className="col-12 col-md-6">
-                <label className="form-label-custom required-label">Full Name *</label>
+                <label className="form-label-custom">Full Name *</label>
                 <input
                   type="text"
                   name="name"
@@ -135,7 +153,7 @@ const AddStudent = () => {
 
               {/* Email Address */}
               <div className="col-12 col-md-6">
-                <label className="form-label-custom required-label">Email Address *</label>
+                <label className="form-label-custom">Email Address *</label>
                 <input
                   type="email"
                   name="email"
@@ -150,7 +168,7 @@ const AddStudent = () => {
 
               {/* Password */}
               <div className="col-12 col-md-6">
-                <label className="form-label-custom required-label">Password *</label>
+                <label className="form-label-custom">Password *</label>
                 <div className="d-flex gap-2">
                   <input
                     type="text"
@@ -197,7 +215,7 @@ const AddStudent = () => {
 
               {/* Roll Number */}
               <div className="col-12 col-md-6 col-lg-4">
-                <label className="form-label-custom required-label">Roll Number (Unique ID) *</label>
+                <label className="form-label-custom">Roll Number (Unique ID) *</label>
                 <input
                   type="text"
                   name="rollNumber"
@@ -212,7 +230,7 @@ const AddStudent = () => {
 
               {/* Program Course */}
               <div className="col-12 col-md-6 col-lg-4">
-                <label className="form-label-custom required-label">Course / Program *</label>
+                <label className="form-label-custom">Course / Program *</label>
                 <input
                   type="text"
                   name="course"
@@ -239,6 +257,35 @@ const AddStudent = () => {
                     <option key={num} value={num}>Semester {num}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Date of Birth */}
+              <div className="col-12 col-md-6">
+                <label className="form-label-custom">Date of Birth *</label>
+                <input
+                  type="date"
+                  name="dob"
+                  className="form-control-custom w-100 text-white"
+                  value={formData.dob}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Government ID Number */}
+              <div className="col-12 col-md-6">
+                <label className="form-label-custom">Government ID Number *</label>
+                <input
+                  type="text"
+                  name="idNumber"
+                  className="form-control-custom w-100"
+                  placeholder="Aadhaar or Govt ID Card No"
+                  value={formData.idNumber}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
               </div>
 
               {/* Department */}
@@ -269,7 +316,7 @@ const AddStudent = () => {
               </div>
 
               {/* Examination Center Assigned */}
-              <div className="col-12">
+              <div className="col-12 col-md-6">
                 <label className="form-label-custom">Assigned Examination Center Venue</label>
                 <input
                   type="text"
@@ -277,6 +324,45 @@ const AddStudent = () => {
                   className="form-control-custom w-100"
                   placeholder="e.g., Lab 2, First Floor, Main Building"
                   value={formData.examCenter}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Exam Subject */}
+              <div className="col-12 col-md-6">
+                <label className="form-label-custom">Exam Subject</label>
+                <input
+                  type="text"
+                  name="examSubject"
+                  className="form-control-custom w-100"
+                  value={formData.examSubject}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Exam Date */}
+              <div className="col-12 col-md-6">
+                <label className="form-label-custom">Exam Date</label>
+                <input
+                  type="text"
+                  name="examDate"
+                  className="form-control-custom w-100"
+                  value={formData.examDate}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Exam Time */}
+              <div className="col-12 col-md-6">
+                <label className="form-label-custom">Exam Time</label>
+                <input
+                  type="text"
+                  name="examTime"
+                  className="form-control-custom w-100"
+                  value={formData.examTime}
                   onChange={handleChange}
                   disabled={loading}
                 />

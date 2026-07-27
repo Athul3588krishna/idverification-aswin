@@ -25,8 +25,10 @@ import { AuthProvider } from "./context/AuthContext";
 // Route guard
 import PrivateRoute from "./components/common/PrivateRoute";
 
-// Pages (will be fully implemented in subsequent phases)
+// Pages
+import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import AddStudent from "./pages/AddStudent";
@@ -40,7 +42,9 @@ function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}
           <Route

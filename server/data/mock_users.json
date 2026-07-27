@@ -1,0 +1,43 @@
+[
+  {
+    "_id": "65b4c123456789abcdef0001",
+    "name": "ExamShield Admin",
+    "email": "admin@examshield.com",
+    "password": "$2b$12$djc4NQ4b9bI3drg49exX/ugAyDDvFGaId1p8l/DuTIbnMQMhr1nma",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "2026-07-27T15:46:17.227Z",
+    "updatedAt": "2026-07-27T15:46:17.228Z"
+  },
+  {
+    "_id": "65b4c123456789abcdef0002",
+    "name": "Security Staff Gate 1",
+    "email": "security@examshield.com",
+    "password": "$2b$12$djc4NQ4b9bI3drg49exX/umKMWojfCqM5Ryh6DMKKKVcl5Jc6FLFq",
+    "role": "security_staff",
+    "isActive": true,
+    "createdAt": "2026-07-27T15:46:17.700Z",
+    "updatedAt": "2026-07-27T15:54:54.589Z"
+  },
+  {
+    "_id": "65b4c123456789abcdef0003",
+    "name": "ATHUL KRISHNA",
+    "email": "athul@examshield.com",
+    "password": "$2b$12$djc4NQ4b9bI3drg49exX/u5wQg0sBqY1Uyk.9Jd.VRiIIcbMXf28q",
+    "role": "student",
+    "isActive": true,
+    "studentProfile": {
+      "rollNumber": "MCA26002",
+      "course": "MCA",
+      "semester": 2,
+      "examCenter": "Hall A - Room 102",
+      "dob": "1999-10-20",
+      "idNumber": "987654321098",
+      "examSubject": "MCA Entrance Examination 2026",
+      "examDate": "2026-08-10",
+      "examTime": "10:00 AM - 1:00 PM"
+    },
+    "createdAt": "2026-07-27T15:46:18.165Z",
+    "updatedAt": "2026-07-27T15:52:57.637Z"
+  }
+]

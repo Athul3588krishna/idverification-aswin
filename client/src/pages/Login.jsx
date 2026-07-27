@@ -184,29 +184,21 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          {/* ── Demo Credentials ── */}
-          <div className="demo-section">
-            <p className="demo-title">Demo Credentials</p>
-            <div className="demo-pills">
-              <button
-                className="demo-pill"
-                onClick={() =>
-                  fillDemo("admin@examshield.com", "Admin@123")
-                }
-              >
-                <span className="demo-role admin">Admin</span>
-                admin@examshield.com
-              </button>
-            </div>
-            <p className="demo-hint">Click to auto-fill credentials</p>
+          <div className="mt-3 text-center">
+            <span className="text-white-50 small">New candidate? </span>
+            <Link to="/register" className="auth-link small" style={{ color: "#818cf8", textDecoration: "none", fontWeight: "600" }}>Register Here</Link>
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <p className="login-footer">
-          ExamShield &copy; {new Date().getFullYear()} &bull; MCA Mini Project
-        </p>
+        {/* ── Footer / Back to Home ── */}
+        <div className="text-center">
+          <Link to="/" className="text-secondary small d-inline-flex align-items-center gap-1 mb-2" style={{ textDecoration: "none" }}>
+            ← Back to System Home
+          </Link>
+          <p className="login-footer">
+            ExamShield Security Portal &copy; {new Date().getFullYear()}
+          </p>
+        </div>
       </div>
 
       {/* ── Login Page CSS (scoped via className) ── */}

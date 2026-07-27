@@ -55,7 +55,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(401);
-    // Generic message — don't tell attacker "email not found"
+    // Say the mail is not found
+
     throw new Error("Invalid email or password");
   }
 
@@ -112,6 +113,11 @@ const registerUser = asyncHandler(async (req, res) => {
     examCenter,
     department,
     admissionYear,
+    dob,
+    idNumber,
+    examSubject,
+    examDate,
+    examTime
   } = req.body;
 
   // ── Validate required fields ──
@@ -152,12 +158,17 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     studentProfile = {
-      rollNumber,
+      rollNumber: rollNumber.toUpperCase(),
       course,
       semester: semester || null,
       examCenter: examCenter || null,
       department: department || null,
       admissionYear: admissionYear || null,
+      dob: dob || "",
+      idNumber: idNumber || "",
+      examSubject: examSubject || "Entrance Examination 2026",
+      examDate: examDate || "2026-08-15",
+      examTime: examTime || "10:00 AM - 1:00 PM"
     };
   }
 
@@ -405,10 +416,83 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════
+// @desc    Self-register a new student (Public)
+// @route   POST /api/auth/student-register
+// @access  Public
+// ═══════════════════════════════════════════════════════════════
+const studentRegister = asyncHandler(async (req, res) => {
+  const {
+    name,
+    email,
+    password,
+    phone,
+    rollNumber,
+    course,
+    semester,
+    dob,
+    idNumber,
+    examSubject,
+    examDate,
+    examTime,
+    examCenter
+  } = req.body;
+
+  if (!name || !email || !password || !rollNumber || !course || !dob || !idNumber) {
+    res.status(400);
+    throw new Error("Name, email, password, roll number, course, DOB, and ID number are required");
+  }
+
+  // Check for duplicate email
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    res.status(409);
+    throw new Error("An account with this email already exists");
+  }
+
+  // Check for duplicate roll number
+  const existingRoll = await User.findOne({
+    "studentProfile.rollNumber": rollNumber.toUpperCase(),
+  });
+  if (existingRoll) {
+    res.status(409);
+    throw new Error(`Roll number '${rollNumber}' is already registered`);
+  }
+
+  const studentProfile = {
+    rollNumber: rollNumber.toUpperCase(),
+    course,
+    semester: Number(semester) || 1,
+    dob,
+    idNumber,
+    examSubject: examSubject || "Entrance Examination 2026",
+    examDate: examDate || "2026-08-15",
+    examTime: examTime || "10:00 AM - 1:00 PM",
+    examCenter: examCenter || "Hall A - Room 101"
+  };
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    phone: phone || null,
+    role: "student",
+    studentProfile,
+    isActive: true,
+  });
+
+  res.status(201).json({
+    success: true,
+    message: "Student registration successful",
+    user: user.toPublicJSON(),
+  });
+});
+
 // ── Export all controller functions ──
 module.exports = {
   loginUser,
   registerUser,
+  studentRegister,
   getMe,
   updateProfile,
   changePassword,

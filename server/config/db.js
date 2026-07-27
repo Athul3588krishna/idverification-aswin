@@ -11,13 +11,14 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // Mongoose 7+ no longer needs these options, but kept for clarity
+      serverSelectionTimeoutMS: 3000, // Timeout after 3 seconds for quick fallback
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
-  process.getMaxListeners(1)
+    console.warn(`⚠️ Switching to Local JSON File Database Mode (Mock DB)!`);
+    global.useMockDB = true;
   }
 };
 

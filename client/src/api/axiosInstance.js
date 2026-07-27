@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
       // Token expired or invalid – force logout
       localStorage.removeItem("examshield_token");
       localStorage.removeItem("examshield_user");
-      window.location.href = "/";
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

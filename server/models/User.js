@@ -60,6 +60,29 @@ const studentProfileSchema = new mongoose.Schema(
     admissionYear: {
       type: Number,
     },
+    dob: {
+      type: String,
+      trim: true, // e.g., "1999-10-20"
+    },
+    idNumber: {
+      type: String,
+      trim: true, // e.g., Aadhaar number or Govt ID
+    },
+    examSubject: {
+      type: String,
+      trim: true,
+      default: "Entrance Examination 2026",
+    },
+    examDate: {
+      type: String,
+      trim: true,
+      default: "2026-08-15",
+    },
+    examTime: {
+      type: String,
+      trim: true,
+      default: "10:00 AM - 1:00 PM",
+    },
     idCardImageUrl: {
       type: String,
       default: null, // Path to uploaded reference ID card image
@@ -198,6 +221,16 @@ userSchema.methods.toPublicJSON = function () {
 userSchema.index({ role: 1 });             // Filter users by role
 userSchema.index({ "studentProfile.rollNumber": 1 }); // OCR roll-number lookup
 
-const User = mongoose.model("User", userSchema);
+const UserSchemaModel = mongoose.model("User", userSchema);
 
-module.exports = User;
+const ProxyModel = new Proxy(UserSchemaModel, {
+  get: (target, prop) => {
+    const actualModel = global.useMockDB
+      ? require("../utils/mockDbHelper").MockUser
+      : UserSchemaModel;
+    const val = actualModel[prop];
+    return typeof val === "function" ? val.bind(actualModel) : val;
+  }
+});
+
+module.exports = ProxyModel;

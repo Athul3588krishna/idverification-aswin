@@ -37,6 +37,7 @@ const router = express.Router();
 const {
   loginUser,
   registerUser,
+  studentRegister,
   getMe,
   updateProfile,
   changePassword,
@@ -59,6 +60,12 @@ const { protect, authorize } = require("../middleware/authMiddleware");
  * Any user (admin, security_staff, student) can login here.
  */
 router.post("/login", loginUser);
+
+/**
+ * POST /api/auth/student-register
+ * Public registration endpoint for students.
+ */
+router.post("/student-register", studentRegister);
 
 // ────────────────────────────────────────────
 // PROTECTED ROUTES — Any authenticated user

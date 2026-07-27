@@ -1,0 +1,10 @@
+RollNumber,Name,Course,Semester,ExamCenter,Status
+MCA26001,Aswin Kumar,MCA,2,Hall A - Room 101,ACTIVE
+MCA26002,Athul Krishna,MCA,2,Hall A - Room 102,ACTIVE
+MCA26003,Sneha Santhosh,MCA,2,Hall B - Room 201,ACTIVE
+MCA26004,Rahul Nair,MCA,2,Hall B - Room 202,SUSPENDED
+MCA26005,Anjali Menon,MCA,2,Hall C - Room 301,ACTIVE
+BCA26021,Harisankar P,BCA,4,Hall C - Room 302,ACTIVE
+BCA26022,Fathima R,BCA,4,Hall D - Room 401,ACTIVE
+CS26081,Gokul Das,B.Tech CSE,6,Lab 1 - Ground Floor,ACTIVE
+CS26082,Meera Pillai,B.Tech CSE,6,Lab 2 - First Floor,SUSPENDED
