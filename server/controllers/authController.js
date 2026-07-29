@@ -60,8 +60,8 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 
-  // ── Check account is active ──
-  if (!user.isActive) {
+  // ── Check account is active (for admin and staff, inactive means deactivated. For students, inactive means pending approval, which is handled in frontend) ──
+  if (!user.isActive && user.role !== "student") {
     res.status(403);
     throw new Error("Your account has been deactivated. Contact an admin.");
   }
@@ -435,12 +435,16 @@ const studentRegister = asyncHandler(async (req, res) => {
     examSubject,
     examDate,
     examTime,
-    examCenter
+    examCenter,
+    otp
   } = req.body;
 
-  if (!name || !email || !password || !rollNumber || !course || !dob || !idNumber) {
+  // Always force role to be 'student' for public registration
+  const targetRole = "student";
+
+  if (!name || !email || !password) {
     res.status(400);
-    throw new Error("Name, email, password, roll number, course, DOB, and ID number are required");
+    throw new Error("Name, email, and password are required");
   }
 
   // Check for duplicate email
@@ -448,6 +452,18 @@ const studentRegister = asyncHandler(async (req, res) => {
   if (existingUser) {
     res.status(409);
     throw new Error("An account with this email already exists");
+  }
+
+  if (!rollNumber || !course || !dob || !idNumber || !otp) {
+    res.status(400);
+    throw new Error("Name, email, password, roll number, course, DOB, ID number, and OTP are required for student registration");
+  }
+
+  // Verify OTP code
+  const { verifyOTP } = require("../utils/otpStore");
+  if (!verifyOTP(email, otp)) {
+    res.status(400);
+    throw new Error("Invalid or expired OTP verification code");
   }
 
   // Check for duplicate roll number
@@ -476,16 +492,54 @@ const studentRegister = asyncHandler(async (req, res) => {
     email,
     password,
     phone: phone || null,
-    role: "student",
+    role: targetRole,
     studentProfile,
-    isActive: true,
+    isActive: false, // Default to inactive (pending admin approval)
   });
 
   res.status(201).json({
     success: true,
-    message: "Student registration successful",
+    message: "Registration successful! Pending Admin approval to download hall ticket.",
     user: user.toPublicJSON(),
   });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// @desc    Generate and Send OTP to candidate email
+// @route   POST /api/auth/send-otp
+// @access  Public
+// ═══════════════════════════════════════════════════════════════
+const sendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400);
+    throw new Error("Please provide an email address");
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+  if (existingUser) {
+    res.status(409);
+    throw new Error("An account with this email already exists");
+  }
+
+  const { generateOTP, saveOTP } = require("../utils/otpStore");
+  const { sendOTPEmail } = require("../utils/mailer");
+
+  const otpCode = generateOTP();
+  saveOTP(email, otpCode);
+
+  try {
+    await sendOTPEmail(email.toLowerCase().trim(), otpCode);
+    res.status(200).json({
+      success: true,
+      message: `Verification code sent to ${email}`
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(`Failed to send verification email: ${error.message}`);
+  }
 });
 
 // ── Export all controller functions ──
@@ -493,6 +547,7 @@ module.exports = {
   loginUser,
   registerUser,
   studentRegister,
+  sendOTP,
   getMe,
   updateProfile,
   changePassword,

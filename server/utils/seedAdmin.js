@@ -27,29 +27,65 @@ const User = require("../models/User");
 
 const seedAdmin = async () => {
   try {
-    // Check if an admin already exists in the database
+    // 1. Seed Admin
     const adminExists = await User.findOne({ role: "admin" });
-
-    if (adminExists) {
-      // Admin already seeded — nothing to do
-      return;
+    if (!adminExists) {
+      await User.create({
+        name: process.env.ADMIN_NAME || "ExamShield Admin",
+        email: process.env.ADMIN_EMAIL || "admin@examshield.com",
+        password: process.env.ADMIN_PASSWORD || "Admin@123",
+        role: "admin",
+        isActive: true,
+      });
+      console.log("✅ Default admin account created:");
+      console.log(`   Email   : ${process.env.ADMIN_EMAIL || "admin@examshield.com"}`);
+      console.log(`   Password: ${process.env.ADMIN_PASSWORD || "Admin@123"}`);
+      console.log("   ⚠️  Change this password after first login!\n");
     }
 
-    // Create the default admin account
-    await User.create({
-      name: process.env.ADMIN_NAME || "ExamShield Admin",
-      email: process.env.ADMIN_EMAIL || "admin@examshield.com",
-      password: process.env.ADMIN_PASSWORD || "Admin@123",
-      role: "admin",
-      isActive: true,
-    });
+    // 2. Seed Security Staff
+    const securityExists = await User.findOne({ email: "security@examshield.com" });
+    if (!securityExists) {
+      await User.create({
+        name: "Security Staff Gate 1",
+        email: "security@examshield.com",
+        password: "Security@123",
+        role: "security_staff",
+        isActive: true,
+      });
+      console.log("✅ Default security staff account created:");
+      console.log("   Email   : security@examshield.com");
+      console.log("   Password: Security@123\n");
+    }
 
-    console.log("✅ Default admin account created:");
-    console.log(`   Email   : ${process.env.ADMIN_EMAIL || "admin@examshield.com"}`);
-    console.log(`   Password: ${process.env.ADMIN_PASSWORD || "Admin@123"}`);
-    console.log("   ⚠️  Change this password after first login!\n");
+    // 3. Seed Demo Student
+    const studentExists = await User.findOne({ email: "aswin@examshield.com" });
+    if (!studentExists) {
+      await User.create({
+        name: "ASWIN KRISHNA",
+        email: "aswin@examshield.com",
+        password: "Student@123",
+        role: "student",
+        isActive: true,
+        studentProfile: {
+          rollNumber: "MCA26001",
+          course: "MCA",
+          semester: 2,
+          examCenter: "Hall A - Room 101",
+          dob: "1998-05-15",
+          idNumber: "123456789012",
+          examSubject: "MCA Entrance Examination 2026",
+          examDate: "2026-08-10",
+          examTime: "10:00 AM - 1:00 PM"
+        }
+      });
+      console.log("✅ Default student account created:");
+      console.log("   Email   : aswin@examshield.com");
+      console.log("   Password: Student@123\n");
+    }
+
   } catch (error) {
-    console.error("❌ Failed to seed admin:", error.message);
+    console.error("❌ Failed to seed database:", error.message);
   }
 };
 

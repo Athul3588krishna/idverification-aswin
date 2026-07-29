@@ -42,6 +42,11 @@ const Verify = () => {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Manual Override states
+  const [manualOverride, setManualOverride] = useState(false);
+  const [manualRollNumber, setManualRollNumber] = useState("");
+  const [verifyingManual, setVerifyingManual] = useState(false);
+
   // Camera capture states
   const [cameraActive, setCameraActive] = useState(false);
   const videoRef = useRef(null);
@@ -158,10 +163,41 @@ const Verify = () => {
     }
   };
 
+  const handleVerifyManual = async () => {
+    if (!manualRollNumber.trim()) {
+      toast.warn("Please enter a roll number");
+      return;
+    }
+
+    setVerifyingManual(true);
+    setResult(null);
+
+    try {
+      const { data } = await axiosInstance.post("/verify/manual", {
+        rollNumber: manualRollNumber.trim()
+      });
+
+      if (data.success) {
+        setResult(data.result);
+        if (data.result.status === "APPROVED") {
+          toast.success("Manual Verification Success! Entry Approved. ✅");
+        } else {
+          toast.error(`Verification Failed: ${data.result.rejectionReason} ❌`);
+        }
+      }
+    } catch (err) {
+      const message = err.response?.data?.message || "Verification request failed.";
+      toast.error(message);
+    } finally {
+      setVerifyingManual(false);
+    }
+  };
+
   const resetScanner = () => {
     setFile(null);
     setPreview(null);
     setResult(null);
+    setManualRollNumber("");
     stopCamera();
   };
 
@@ -195,81 +231,133 @@ const Verify = () => {
               <div className="glass-card h-100">
                 <h4 className="mb-3 d-flex align-items-center gap-2">
                   <FiCpu size={20} className="text-primary-light" />
-                  1. Capture/Upload ID Image
+                  {manualOverride ? "1. Emergency Manual Verification" : "1. Capture/Upload ID Image"}
                 </h4>
 
-                {/* Live Webcam Canvas Area */}
-                {cameraActive ? (
-                  <div className="camera-box position-relative rounded overflow-hidden mb-3 border border-secondary" style={{ height: "300px" }}>
-                    <video ref={videoRef} autoPlay playsInline className="w-100 h-100 object-fit-cover" />
-                    <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
-                      <button type="button" onClick={captureSnapshot} className="btn btn-success d-flex align-items-center gap-2">
-                        <FiCamera size={16} /> Snap Photo
-                      </button>
-                      <button type="button" onClick={stopCamera} className="btn btn-danger">
-                        Cancel
-                      </button>
+                {manualOverride ? (
+                  <div className="manual-override-box d-flex flex-column align-items-center justify-content-center gap-3 mb-3 border border-secondary rounded" style={{ height: "300px", background: "rgba(255,255,255,0.01)" }}>
+                    <div className="w-100 px-4">
+                      <label className="form-label-custom mb-2">Candidate Roll Number *</label>
+                      <input
+                        type="text"
+                        className="form-control-custom w-100 text-center uppercase text-white"
+                        placeholder="e.g. MCA26002"
+                        value={manualRollNumber}
+                        onChange={(e) => setManualRollNumber(e.target.value)}
+                        disabled={verifyingManual}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleVerifyManual();
+                        }}
+                        style={{ fontSize: "1.2rem", letterSpacing: "0.05em", background: "rgba(0,0,0,0.2)" }}
+                      />
                     </div>
-                  </div>
-                ) : preview ? (
-                  // Preview of captured / uploaded file
-                  <div className="preview-box position-relative rounded overflow-hidden mb-3 border" style={{ height: "300px", borderColor: "var(--border-color)" }}>
-                    <img src={preview} alt="ID Card Snapshot" className="w-100 h-100 object-fit-contain" />
                     <button
                       type="button"
-                      onClick={resetScanner}
-                      className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                      onClick={handleVerifyManual}
+                      disabled={verifyingManual || !manualRollNumber.trim()}
+                      className="btn btn-success px-5 py-2 mt-2 d-flex align-items-center gap-2"
                     >
-                      Clear
+                      {verifyingManual ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                          Checking Database...
+                        </>
+                      ) : (
+                        "Verify Candidate"
+                      )}
                     </button>
                   </div>
                 ) : (
-                  // Upload Zone / Camera Activator
-                  <div
-                    className="upload-zone mb-3 d-flex flex-column align-items-center justify-content-center gap-3"
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    style={{ height: "300px" }}
-                  >
-                    <FiUploadCloud size={48} className="text-muted" />
-                    <div>
-                      <p className="mb-1 text-light">Drag & drop ID card image here</p>
-                      <p className="small text-muted mb-0">Supports JPG, JPEG, PNG (Max 5MB)</p>
-                    </div>
-                    <div className="d-flex gap-2 mt-2">
-                      <label className="btn btn-sm btn-primary-custom m-0" style={{ cursor: "pointer" }}>
-                        Browse File
-                        <input type="file" className="d-none" accept="image/*" onChange={handleFileChange} />
-                      </label>
-                      <button type="button" onClick={startCamera} className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" style={{
-                        borderColor: "var(--border-color)",
-                        color: "var(--text-primary)"
-                      }}>
-                        <FiCamera size={14} /> Open Webcam
-                      </button>
-                    </div>
-                  </div>
+                  <>
+                    {/* Live Webcam Canvas Area */}
+                    {cameraActive ? (
+                      <div className="camera-box position-relative rounded overflow-hidden mb-3 border border-secondary" style={{ height: "300px" }}>
+                        <video ref={videoRef} autoPlay playsInline className="w-100 h-100 object-fit-cover" />
+                        <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
+                          <button type="button" onClick={captureSnapshot} className="btn btn-success d-flex align-items-center gap-2">
+                            <FiCamera size={16} /> Snap Photo
+                          </button>
+                          <button type="button" onClick={stopCamera} className="btn btn-danger">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : preview ? (
+                      // Preview of captured / uploaded file
+                      <div className="preview-box position-relative rounded overflow-hidden mb-3 border" style={{ height: "300px", borderColor: "var(--border-color)" }}>
+                        <img src={preview} alt="ID Card Snapshot" className="w-100 h-100 object-fit-contain" />
+                        <button
+                          type="button"
+                          onClick={resetScanner}
+                          className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    ) : (
+                      // Upload Zone / Camera Activator
+                      <div
+                        className="upload-zone mb-3 d-flex flex-column align-items-center justify-content-center gap-3"
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        style={{ height: "300px" }}
+                      >
+                        <FiUploadCloud size={48} className="text-muted" />
+                        <div>
+                          <p className="mb-1 text-light">Drag & drop ID card image here</p>
+                          <p className="small text-muted mb-0">Supports JPG, JPEG, PNG (Max 5MB)</p>
+                        </div>
+                        <div className="d-flex gap-2 mt-2">
+                          <label className="btn btn-sm btn-primary-custom m-0" style={{ cursor: "pointer" }}>
+                            Browse File
+                            <input type="file" className="d-none" accept="image/*" onChange={handleFileChange} />
+                          </label>
+                          <button type="button" onClick={startCamera} className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" style={{
+                            borderColor: "var(--border-color)",
+                            color: "var(--text-primary)"
+                          }}>
+                            <FiCamera size={14} /> Open Webcam
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Scan Button Action */}
+                    <button
+                      type="button"
+                      onClick={handleVerify}
+                      disabled={scanning || (!file && !cameraActive)}
+                      className="btn btn-primary-custom w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+                    >
+                      {scanning ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                          Analyzing Document with Tesseract OCR...
+                        </>
+                      ) : (
+                        <>
+                          <FiCpu size={18} />
+                          Extract Text & Match Details
+                        </>
+                      )}
+                    </button>
+                  </>
                 )}
 
-                {/* Scan Button Action */}
-                <button
-                  type="button"
-                  onClick={handleVerify}
-                  disabled={scanning || (!file && !cameraActive)}
-                  className="btn btn-primary-custom w-100 py-3 d-flex align-items-center justify-content-center gap-2"
-                >
-                  {scanning ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                      Analyzing Document with Tesseract OCR...
-                    </>
-                  ) : (
-                    <>
-                      <FiCpu size={18} />
-                      Extract Text & Match Details
-                    </>
-                  )}
-                </button>
+                {/* Manual Override Link */}
+                <div className="mt-3 text-center">
+                  <button
+                    type="button"
+                    className="btn btn-link text-white-50 small text-decoration-none p-0"
+                    onClick={() => {
+                      setManualOverride(!manualOverride);
+                      resetScanner();
+                    }}
+                    style={{ fontSize: "0.85rem", transition: "color 0.2s" }}
+                  >
+                    {manualOverride ? "← Back to OCR Scanner Showcase" : "ID Card damaged or OCR unreadable? Use Manual Override Lookup"}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -291,7 +379,7 @@ const Verify = () => {
                 {!scanning && !result && (
                   <div className="d-flex flex-column align-items-center justify-content-center h-75 py-5 text-secondary text-center">
                     <FiCpu size={40} className="text-muted mb-2" />
-                    <p className="mb-0">Waiting for OCR input image capture.</p>
+                    <p className="mb-0">{manualOverride ? "Waiting for manual roll number input." : "Waiting for OCR input image capture."}</p>
                   </div>
                 )}
 

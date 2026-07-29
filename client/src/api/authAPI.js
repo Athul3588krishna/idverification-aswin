@@ -130,3 +130,14 @@ export const studentRegisterAPI = async (userData) => {
   const { data } = await axiosInstance.post("/auth/student-register", userData);
   return data;
 };
+
+/**
+ * sendOTPAPI
+ * POST /api/auth/send-otp (Public)
+ * @param {{ email: string }} payload
+ * @returns {{ success, message }}
+ */
+export const sendOTPAPI = async (payload) => {
+  const { data } = await axiosInstance.post("/auth/send-otp", payload);
+  return data;
+};

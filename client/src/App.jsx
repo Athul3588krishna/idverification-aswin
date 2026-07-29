@@ -47,6 +47,7 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/student/login" element={<StudentLogin />} />
           <Route path="/student/register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<AdminLogin />} /> {/* Fallback/shortcut */}
 
           {/* Protected Routes */}

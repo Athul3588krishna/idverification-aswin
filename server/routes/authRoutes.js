@@ -38,6 +38,7 @@ const {
   loginUser,
   registerUser,
   studentRegister,
+  sendOTP,
   getMe,
   updateProfile,
   changePassword,
@@ -66,6 +67,12 @@ router.post("/login", loginUser);
  * Public registration endpoint for students.
  */
 router.post("/student-register", studentRegister);
+
+/**
+ * POST /api/auth/send-otp
+ * Public endpoint to request a registration OTP.
+ */
+router.post("/send-otp", sendOTP);
 
 // ────────────────────────────────────────────
 // PROTECTED ROUTES — Any authenticated user

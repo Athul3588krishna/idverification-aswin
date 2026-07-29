@@ -236,8 +236,85 @@ const getStats = asyncHandler(async (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════
+// @desc    Perform Manual Roll Number Matching (No OCR Fallback)
+// @route   POST /api/verify/manual
+// @access  Private — Security Staff & Admin
+// ═══════════════════════════════════════════════════════════════
+const verifyStudentCardManual = asyncHandler(async (req, res) => {
+  const { rollNumber } = req.body;
+
+  if (!rollNumber) {
+    res.status(400);
+    throw new Error("Please provide a roll number");
+  }
+
+  // Find student by roll number
+  const student = await User.findOne({
+    role: "student",
+    "studentProfile.rollNumber": rollNumber.trim().toUpperCase()
+  });
+
+  let status = "REJECTED";
+  let rejectionReason = "";
+
+  if (student) {
+    if (!student.isActive) {
+      status = "REJECTED";
+      rejectionReason = "Candidate account is Pending/Suspended";
+    } else {
+      status = "APPROVED";
+    }
+  } else {
+    status = "REJECTED";
+    rejectionReason = "Roll number not found in registered student database";
+  }
+
+  // Write audit log entry to MongoDB
+  const logData = {
+    student: student ? student._id : null,
+    scannedRollNumber: rollNumber.trim().toUpperCase(),
+    scannedName: student ? student.name : "Unknown Name",
+    rawOcrText: "MANUAL OVERRIDE CHECK",
+    matchedDetails: student ? {
+      name: student.name,
+      rollNumber: student.studentProfile.rollNumber,
+      course: student.studentProfile.course,
+      examCenter: student.studentProfile.examCenter
+    } : {
+      name: "",
+      rollNumber: rollNumber.trim().toUpperCase(),
+      course: "",
+      examCenter: ""
+    },
+    matchPercentage: 100,
+    status,
+    rejectionReason,
+    idCardPhotoPath: null,
+    verifiedBy: req.user._id // Logged in operator
+  };
+
+  const savedLog = await require("../models/VerificationLog").create(logData);
+
+  res.status(201).json({
+    success: true,
+    message: status === "APPROVED" ? "Manual Verification Success! Entry Approved." : `Entry Denied: ${rejectionReason}`,
+    result: {
+      status,
+      rejectionReason,
+      matchPercentage: 100,
+      scannedRollNumber: rollNumber.trim().toUpperCase(),
+      scannedName: logData.scannedName,
+      matchedDetails: logData.matchedDetails,
+      idCardPhotoPath: null,
+      logId: savedLog._id
+    }
+  });
+});
+
 module.exports = {
   verifyStudentCard,
+  verifyStudentCardManual,
   getVerificationLogs,
   getStats
 };

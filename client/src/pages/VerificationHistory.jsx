@@ -31,6 +31,8 @@ import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
 import axiosInstance from "../api/axiosInstance";
 
+const serverBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api").replace(/\/api$/, "");
+
 const VerificationHistory = () => {
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
@@ -229,7 +231,7 @@ const VerificationHistory = () => {
                         <td className="text-end">
                           {log.idCardPhotoPath ? (
                             <a
-                              href={`http://localhost:5000${log.idCardPhotoPath}`}
+                              href={`${serverBaseUrl}${log.idCardPhotoPath}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn btn-sm btn-outline-secondary p-2 d-inline-flex align-items-center justify-content-center"

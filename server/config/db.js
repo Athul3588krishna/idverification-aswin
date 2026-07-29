@@ -1,10 +1,3 @@
-/**
- * config/db.js
- * ---------------------------------------------------------
- * Establishes and manages the MongoDB connection using
- * Mongoose. Exported as an async function called once
- * during server startup.
- */
 
 const mongoose = require("mongoose");
 

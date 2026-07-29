@@ -25,7 +25,8 @@ import {
   FiTrash2,
   FiMapPin,
   FiClock,
-  FiBookOpen
+  FiBookOpen,
+  FiPhone
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth";
@@ -693,7 +694,13 @@ const Dashboard = () => {
                       <small className="d-block text-muted">{user.studentProfile?.examTime || "10:00 AM"}</small>
                     </div>
                     <div className="col-md-3 text-md-end">
-                      <button className="btn btn-primary-custom btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1 mt-2 mt-md-0" onClick={() => setShowAdmitCard(true)}>
+                      <button
+                        className="btn btn-primary-custom btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1 mt-2 mt-md-0"
+                        onClick={() => setShowAdmitCard(true)}
+                        disabled={!user.isActive}
+                        style={!user.isActive ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                        title={!user.isActive ? "Admit Card is locked until Admin approval" : "View Admit Card"}
+                      >
                         <FiFileText size={14} /> Admit Card
                       </button>
                     </div>
@@ -706,7 +713,17 @@ const Dashboard = () => {
                 <div className="glass-card text-center d-flex flex-column align-items-center justify-content-center p-4 h-100">
                   
                   {/* Verification Status badges */}
-                  {verificationStatus === "APPROVED" && (
+                  {!user.isActive ? (
+                    <>
+                      <div className="p-3 bg-warning-glow rounded-circle mb-3 text-warning" style={{ width: "fit-content", backgroundColor: "rgba(245, 158, 11, 0.15)" }}>
+                        <FiAlertTriangle size={56} />
+                      </div>
+                      <h4 className="fw-bold text-warning">Approval Pending</h4>
+                      <p className="text-secondary px-3 mt-2">
+                        Your self-registration is currently pending administrator approval. Your hall ticket (Admit Card) will be generated and downloadable here once approved.
+                      </p>
+                    </>
+                  ) : verificationStatus === "APPROVED" ? (
                     <>
                       <div className="p-3 bg-success-glow rounded-circle mb-3 text-success" style={{ width: "fit-content", backgroundColor: "rgba(16,185,129,0.15)" }}>
                         <FiCheckCircle size={56} />
@@ -716,9 +733,7 @@ const Dashboard = () => {
                         Gate security verified your identity card successfully at {new Date(recentStudentLog?.createdAt).toLocaleString()}. You are cleared for entry to the examination hall.
                       </p>
                     </>
-                  )}
-
-                  {verificationStatus === "REJECTED" && (
+                  ) : verificationStatus === "REJECTED" ? (
                     <>
                       <div className="p-3 bg-danger-glow rounded-circle mb-3 text-danger" style={{ width: "fit-content", backgroundColor: "rgba(239,68,68,0.15)" }}>
                         <FiXCircle size={56} />
@@ -728,9 +743,7 @@ const Dashboard = () => {
                         Entry scan attempt was rejected: <strong className="text-danger">{verificationReason || "Failed OCR checks"}</strong>. Please contact the main administrator desk.
                       </p>
                     </>
-                  )}
-
-                  {verificationStatus === "PENDING" && (
+                  ) : (
                     <>
                       <div className="p-3 bg-primary-glow rounded-circle mb-3 text-primary" style={{ width: "fit-content", backgroundColor: "rgba(79,70,229,0.15)" }}>
                         <FiShield size={56} />

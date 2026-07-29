@@ -183,8 +183,8 @@ const Students = () => {
                         <td>Sem {student.studentProfile?.semester || "N/A"}</td>
                         <td className="text-wrap" style={{ maxWidth: "200px" }}>{student.studentProfile?.examCenter || "N/A"}</td>
                         <td>
-                          <span className={student.isActive ? "badge-success" : "badge-danger"}>
-                            {student.isActive ? "ACTIVE / ELIGIBLE" : "SUSPENDED"}
+                          <span className={student.isActive ? "badge-success" : "badge-warning"}>
+                            {student.isActive ? "ACTIVE / ELIGIBLE" : "PENDING APPROVAL"}
                           </span>
                         </td>
                         <td className="text-end">
@@ -194,7 +194,7 @@ const Students = () => {
                               onClick={() => handleToggleStatus(student._id, student.isActive)}
                               className={`btn btn-sm ${student.isActive ? "btn-outline-warning" : "btn-outline-success"}`}
                               style={{ padding: "0.3rem 0.5rem" }}
-                              title={student.isActive ? "Block Access" : "Unblock Access"}
+                              title={student.isActive ? "Block Student" : "Approve Student"}
                             >
                               {student.isActive ? <FiUserX size={16} /> : <FiUserCheck size={16} />}
                             </button>

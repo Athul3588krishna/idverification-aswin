@@ -3,41 +3,41 @@
     "_id": "65b4c123456789abcdef0001",
     "name": "ExamShield Admin",
     "email": "admin@examshield.com",
-    "password": "$2b$12$djc4NQ4b9bI3drg49exX/ugAyDDvFGaId1p8l/DuTIbnMQMhr1nma",
+    "password": "$2b$12$Hxc3i0XhPafm5eCwb0Ipc.qdCTfGYwTfbBAvuKl8uqAYnmiDUY7Fi",
     "role": "admin",
     "isActive": true,
-    "createdAt": "2026-07-27T15:46:17.227Z",
-    "updatedAt": "2026-07-27T16:25:50.128Z"
+    "createdAt": "2026-07-28T01:09:37.230Z",
+    "updatedAt": "2026-07-28T01:09:37.231Z"
   },
   {
     "_id": "65b4c123456789abcdef0002",
     "name": "Security Staff Gate 1",
     "email": "security@examshield.com",
-    "password": "$2b$12$djc4NQ4b9bI3drg49exX/umKMWojfCqM5Ryh6DMKKKVcl5Jc6FLFq",
+    "password": "$2b$12$Hxc3i0XhPafm5eCwb0Ipc.2LAcHoZ3ZU7nZqNBJRMOLAwrI1WYd.q",
     "role": "security_staff",
     "isActive": true,
-    "createdAt": "2026-07-27T15:46:17.700Z",
-    "updatedAt": "2026-07-27T15:54:54.589Z"
+    "createdAt": "2026-07-28T01:09:37.549Z",
+    "updatedAt": "2026-07-28T01:09:37.549Z"
   },
   {
     "_id": "65b4c123456789abcdef0003",
-    "name": "ATHUL KRISHNA",
-    "email": "athul@examshield.com",
-    "password": "$2b$12$djc4NQ4b9bI3drg49exX/u5wQg0sBqY1Uyk.9Jd.VRiIIcbMXf28q",
+    "name": "ASWIN KRISHNA",
+    "email": "aswin@examshield.com",
+    "password": "$2b$12$Hxc3i0XhPafm5eCwb0Ipc.QFwtolNIDPbPLGsHQKxwR4QDjIxken.",
     "role": "student",
     "isActive": true,
     "studentProfile": {
-      "rollNumber": "MCA26002",
+      "rollNumber": "MCA26001",
       "course": "MCA",
       "semester": 2,
-      "examCenter": "Hall A - Room 102",
-      "dob": "1999-10-20",
-      "idNumber": "987654321098",
+      "examCenter": "Hall A - Room 101",
+      "dob": "1998-05-15",
+      "idNumber": "123456789012",
       "examSubject": "MCA Entrance Examination 2026",
       "examDate": "2026-08-10",
       "examTime": "10:00 AM - 1:00 PM"
     },
-    "createdAt": "2026-07-27T15:46:18.165Z",
-    "updatedAt": "2026-07-27T15:52:57.637Z"
+    "createdAt": "2026-07-28T01:09:37.868Z",
+    "updatedAt": "2026-07-28T01:09:37.868Z"
   }
 ]

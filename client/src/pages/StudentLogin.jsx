@@ -29,6 +29,21 @@ const StudentLogin = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Listen for #admin in the URL hash to redirect to the admin login page
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === "#admin") {
+        navigate("/admin/login");
+      }
+    };
+
+    // Trigger check immediately on mount
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [navigate]);
+
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -91,7 +106,7 @@ const StudentLogin = () => {
                   type="email"
                   name="email"
                   className="form-control-custom with-icon"
-                  placeholder="athul@examshield.com"
+                  placeholder="aswin@examshield.com"
                   value={formData.email}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -140,9 +155,9 @@ const StudentLogin = () => {
             <small className="text-white-50 d-block mb-2">QUICK FILL DEMO CREDENTIALS</small>
             <button
               className="btn btn-sm btn-outline-secondary text-white-50 w-100"
-              onClick={() => setFormData({ email: "athul@examshield.com", password: "Student@123" })}
+              onClick={() => setFormData({ email: "aswin@examshield.com", password: "Student@123" })}
             >
-              Demo Student (ATHUL KRISHNA)
+              Demo Student (ASWIN KRISHNA)
             </button>
           </div>
         </div>

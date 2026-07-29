@@ -182,17 +182,15 @@ const userSchema = new mongoose.Schema(
 // This runs BEFORE every .save() call.
 // It only re-hashes if the password field was actually modified,
 // preventing double-hashing on profile updates.
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // If password wasn't changed, skip hashing
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
   // Generate a salt (cost factor 12 = good security/speed balance)
   const salt = await bcrypt.genSalt(12);
 
   // Replace the plain-text password with the hashed version
   this.password = await bcrypt.hash(this.password, salt);
-
-  next();
 });
 
 // ═══════════════════════════════════════════════════════════════

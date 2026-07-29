@@ -17,6 +17,7 @@ const router = express.Router();
 
 const {
   verifyStudentCard,
+  verifyStudentCardManual,
   getVerificationLogs,
   getStats
 } = require("../controllers/verificationController");
@@ -32,6 +33,14 @@ router.post(
   authorize("admin", "security_staff"),
   upload.single("idCard"),
   verifyStudentCard
+);
+
+// ── Route: Perform Manual Roll Number Verification Check ──
+router.post(
+  "/manual",
+  protect,
+  authorize("admin", "security_staff"),
+  verifyStudentCardManual
 );
 
 // ── Route: Query Paginated Scanning Logs ──

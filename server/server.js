@@ -30,7 +30,19 @@ const app = express();
 // Enable Cross-Origin Resource Sharing for the React frontend
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        process.env.CLIENT_ORIGIN
+      ];
+      if (allowedOrigins.includes(origin) || origin.startsWith("http://localhost:")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );

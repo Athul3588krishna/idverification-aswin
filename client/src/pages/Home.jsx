@@ -12,7 +12,7 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FiShield,
@@ -30,6 +30,21 @@ import useAuth from "../hooks/useAuth";
 const Home = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Listen for #admin in the URL hash to redirect to the admin login page
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === "#admin") {
+        navigate("/admin/login");
+      }
+    };
+
+    // Trigger check immediately on mount
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [navigate]);
 
   return (
     <div className="gradient-bg min-vh-100 d-flex flex-column text-light">
@@ -57,18 +72,21 @@ const Home = () => {
             </span>
           </Link>
 
-          <div className="d-flex align-items-center gap-3">
+          <div className="d-flex align-items-center gap-2">
             {isAuthenticated ? (
               <Link to="/dashboard" className="btn btn-primary-custom d-flex align-items-center gap-2">
                 Go to Dashboard <FiArrowRight size={16} />
               </Link>
             ) : (
               <>
-                <Link to="/student/login" className="btn btn-outline-secondary d-flex align-items-center gap-2 text-white" style={{ borderColor: "var(--border-color)" }}>
-                  Candidate Portal
+                <Link to="/student/login" className="btn btn-link text-white-50 text-decoration-none small me-2 px-2" style={{ fontSize: "0.9rem" }}>
+                  Candidate Login
                 </Link>
-                <Link to="/admin/login" className="btn btn-primary-custom d-flex align-items-center gap-2">
-                  <FiLock size={16} /> Staff Portal
+                <Link to="/admin/login" className="btn btn-outline-secondary text-white small me-2 px-3 py-2" style={{ borderColor: "var(--border-color)", fontSize: "0.9rem" }}>
+                  Staff Login
+                </Link>
+                <Link to="/register" className="btn btn-primary-custom small px-3 py-2" style={{ fontSize: "0.9rem" }}>
+                  Register
                 </Link>
               </>
             )}
@@ -101,30 +119,61 @@ const Home = () => {
             ExamShield prevents examination impersonation and fraud by instantly analyzing student ID cards with Tesseract OCR technology, cross-referencing candidate rosters in real-time.
           </p>
 
-          <div className="d-flex flex-wrap justify-content-center gap-3 mb-5">
+          <div className="d-flex flex-wrap justify-content-center gap-4 mb-5 mx-auto" style={{ maxWidth: "800px" }}>
             {isAuthenticated ? (
-              <Link to="/dashboard" className="btn btn-primary-custom px-4 py-3 text-lg d-flex align-items-center gap-2">
-                Open Security Dashboard <FiArrowRight size={18} />
-              </Link>
+              <div className="d-flex gap-3 justify-content-center w-100">
+                <Link to="/dashboard" className="btn btn-primary-custom px-5 py-3 text-lg d-flex align-items-center gap-2">
+                  Open Security Dashboard <FiArrowRight size={18} />
+                </Link>
+                <a href="#how-it-works" className="btn btn-outline-secondary px-5 py-3 text-lg text-white" style={{ borderColor: "var(--border-color)" }}>
+                  How It Works
+                </a>
+              </div>
             ) : (
-              <>
-                <Link to="/student/login" className="btn btn-primary-custom px-4 py-3 text-lg d-flex align-items-center gap-2">
-                  <FiUserCheck size={18} /> Candidate Portal
-                </Link>
-                <Link to="/admin/login" className="btn btn-outline-secondary px-4 py-3 text-lg d-flex align-items-center gap-2" style={{
-                  borderColor: "var(--border-color)",
-                  color: "var(--text-primary)"
-                }}>
-                  <FiLock size={18} /> Staff / Admin Portal
-                </Link>
-              </>
+              <div className="row g-4 w-100 text-start">
+                {/* Candidate Portal Card */}
+                <div className="col-12 col-md-6">
+                  <div className="glass-card p-4 text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div className="p-3 bg-primary-glow rounded-circle mb-3 d-inline-block" style={{ color: "var(--primary-light)" }}>
+                        <FiUserCheck size={28} />
+                      </div>
+                      <h4 className="fw-bold text-white mb-2">Candidate Portal</h4>
+                      <p className="text-secondary small mb-4">View your entrance exam hall ticket, check roll number, and verify credentials.</p>
+                    </div>
+                    <div className="d-flex gap-2 justify-content-center">
+                      <Link to="/student/login" className="btn btn-primary-custom w-100 py-2">
+                        Login
+                      </Link>
+                      <Link to="/student/register" className="btn btn-outline-secondary w-100 py-2 text-white" style={{ borderColor: "var(--border-color)" }}>
+                        Register
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Staff & Admin Portal Card */}
+                <div className="col-12 col-md-6">
+                  <div className="glass-card p-4 text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                      <div className="p-3 rounded-circle mb-3 d-inline-block" style={{ background: "rgba(59, 130, 246, 0.1)", color: "var(--accent-blue)" }}>
+                        <FiLock size={28} />
+                      </div>
+                      <h4 className="fw-bold text-white mb-2">Staff & Admin Portal</h4>
+                      <p className="text-secondary small mb-4">OCR ID card scanning, exam center entry checks, and logs audit dashboard.</p>
+                    </div>
+                    <div className="d-flex gap-2 justify-content-center">
+                      <Link to="/admin/login" className="btn btn-primary-custom w-100 py-2">
+                        Login
+                      </Link>
+                      <Link to="/register" className="btn btn-outline-secondary w-100 py-2 text-white" style={{ borderColor: "var(--border-color)" }}>
+                        Register
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
-            <a href="#how-it-works" className="btn btn-outline-secondary px-4 py-3 text-lg" style={{
-              borderColor: "var(--border-color)",
-              color: "var(--text-primary)"
-            }}>
-              How It Works
-            </a>
           </div>
 
           {/* Key Metric Highlights */}

@@ -130,6 +130,11 @@ const AdminLogin = () => {
             </button>
           </form>
 
+          <div className="mt-3 text-center">
+            <span className="text-white-50 small">New staff? </span>
+            <Link to="/register" className="auth-link small" style={{ color: "#818cf8", textDecoration: "none", fontWeight: "600" }}>Register Here</Link>
+          </div>
+
           {/* Quick-fill section */}
           <div className="mt-4 border-top border-secondary pt-3 text-center">
             <small className="text-white-50 d-block mb-2">QUICK FILL DEMO CREDENTIALS</small>
