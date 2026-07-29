@@ -30,6 +30,7 @@ import Navbar from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
 import axiosInstance from "../api/axiosInstance";
+import { io } from "socket.io-client";
 
 const serverBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api").replace(/\/api$/, "");
 
@@ -78,6 +79,34 @@ const VerificationHistory = () => {
   useEffect(() => {
     fetchLogs();
   }, [page]);
+
+  // Listen for real-time verification logs via Socket.io
+  useEffect(() => {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api";
+    const SOCKET_URL = API_BASE_URL.replace("/api", "");
+    const socket = io(SOCKET_URL);
+
+    socket.on("connect", () => {
+      console.log("⚡ Real-time logs channel active");
+      socket.emit("join", "admin");
+      socket.emit("join", "security_staff");
+    });
+
+    socket.on("verification_logged", (data) => {
+      // Prepend the new log dynamically if we are on the first page
+      if (page === 1 && !search && !statusFilter) {
+        setLogs((prev) => [data.log, ...prev].slice(0, 10)); // Keep to limit
+        setTotalLogs((prev) => prev + 1);
+      } else {
+        fetchLogs();
+      }
+      toast.info(`🔔 New verification log received for ${data.rollNumber || "candidate"}!`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [page, search, statusFilter]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";

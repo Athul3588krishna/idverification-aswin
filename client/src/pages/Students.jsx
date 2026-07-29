@@ -28,6 +28,7 @@ import Navbar from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
 import { getAllUsersAPI, updateUserStatusAPI, deleteUserAPI } from "../api/authAPI";
+import { io } from "socket.io-client";
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -71,6 +72,31 @@ const Students = () => {
   useEffect(() => {
     fetchStudents();
   }, [page]);
+
+  // Listen for real-time student status updates via Socket.io
+  useEffect(() => {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api";
+    const SOCKET_URL = API_BASE_URL.replace("/api", "");
+    const socket = io(SOCKET_URL);
+
+    socket.on("connect", () => {
+      console.log("⚡ Real-time students channel active");
+      socket.emit("join", "admin");
+    });
+
+    socket.on("student_status_updated", (data) => {
+      // Find and update status in state in real-time
+      setStudents((prev) =>
+        prev.map((student) =>
+          student._id === data.userId ? { ...student, isActive: data.isActive } : student
+        )
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleToggleStatus = async (id, currentStatus) => {
     try {
@@ -122,9 +148,6 @@ const Students = () => {
               <p className="text-secondary mb-0">Total: {totalStudents} registered students</p>
             </div>
             <div className="col-auto">
-              <Link to="/students/add" className="btn btn-primary-custom d-flex align-items-center gap-2">
-                <FiPlus size={16} /> Register Student
-              </Link>
             </div>
           </div>
 

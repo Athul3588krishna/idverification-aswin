@@ -39,5 +39,47 @@
     },
     "createdAt": "2026-07-28T01:09:37.868Z",
     "updatedAt": "2026-07-28T01:09:37.868Z"
+  },
+  {
+    "_id": "user_q5sii4xuq",
+    "name": "Aswin Kumar",
+    "email": "candidate_1785335680185@university.edu",
+    "role": "student",
+    "studentProfile": {
+      "rollNumber": "MCA25393",
+      "course": "MCA",
+      "semester": 2,
+      "dob": "2001-05-20",
+      "idNumber": "987654321012",
+      "examCenter": "Hall A - Room 102",
+      "examSubject": "Entrance Examination 2026",
+      "examDate": "2026-08-10",
+      "examTime": "10:00 AM - 1:00 PM"
+    },
+    "isActive": false,
+    "password": "",
+    "createdAt": "2026-07-29T14:34:40.186Z",
+    "updatedAt": "2026-07-29T14:34:40.189Z"
+  },
+  {
+    "_id": "user_5zljuwc39",
+    "name": "Aswin Kumar",
+    "email": "candidate_1785335765533@university.edu",
+    "role": "student",
+    "studentProfile": {
+      "rollNumber": "MCA22072",
+      "course": "MCA",
+      "semester": 2,
+      "dob": "2001-05-20",
+      "idNumber": "987654321012",
+      "examCenter": "Hall A - Room 102",
+      "examSubject": "Entrance Examination 2026",
+      "examDate": "2026-08-10",
+      "examTime": "10:00 AM - 1:00 PM"
+    },
+    "isActive": true,
+    "password": "",
+    "createdAt": "2026-07-29T14:36:05.535Z",
+    "updatedAt": "2026-07-29T14:36:05.535Z"
   }
 ]

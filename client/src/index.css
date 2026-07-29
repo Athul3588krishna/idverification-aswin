@@ -386,3 +386,52 @@ a:hover { color: var(--primary); }
 .Toastify__progress-bar--success { background: var(--accent-green) !important; }
 .Toastify__progress-bar--error   { background: var(--accent-red) !important; }
 .Toastify__progress-bar--info    { background: var(--primary-light) !important; }
+
+/* ── Global Form Control Icons & Button Overrides ── */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.form-control-custom.with-icon {
+  padding-left: 2.75rem !important;
+}
+
+.form-control-custom.with-action {
+  padding-right: 3rem !important;
+}
+
+.auth-link {
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: var(--text-primary);
+}
+
+.btn-custom {
+  background: var(--primary-color);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.btn-custom:hover {
+  background: var(--primary-light);
+  box-shadow: 0 0 15px var(--primary-glow);
+}

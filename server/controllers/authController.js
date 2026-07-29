@@ -168,7 +168,8 @@ const registerUser = asyncHandler(async (req, res) => {
       idNumber: idNumber || "",
       examSubject: examSubject || "Entrance Examination 2026",
       examDate: examDate || "2026-08-15",
-      examTime: examTime || "10:00 AM - 1:00 PM"
+      examTime: examTime || "10:00 AM - 1:00 PM",
+      idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
     };
   }
 
@@ -382,6 +383,19 @@ const updateUserStatus = asyncHandler(async (req, res) => {
   user.isActive = isActive;
   await user.save({ validateBeforeSave: false });
 
+  // Emit real-time status update via Socket.io
+  try {
+    const { emitEvent } = require("../utils/socket");
+    emitEvent("student_status_updated", {
+      userId: user._id,
+      email: user.email,
+      isActive: user.isActive,
+      user: user.toPublicJSON()
+    });
+  } catch (err) {
+    console.error("Socket emit error:", err.message);
+  }
+
   res.status(200).json({
     success: true,
     message: `Account has been ${isActive ? "activated" : "deactivated"}`,
@@ -484,7 +498,8 @@ const studentRegister = asyncHandler(async (req, res) => {
     examSubject: examSubject || "Entrance Examination 2026",
     examDate: examDate || "2026-08-15",
     examTime: examTime || "10:00 AM - 1:00 PM",
-    examCenter: examCenter || "Hall A - Room 101"
+    examCenter: examCenter || "Hall A - Room 101",
+    idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
   };
 
   const user = await User.create({

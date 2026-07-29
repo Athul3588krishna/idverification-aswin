@@ -385,25 +385,48 @@ const Verify = () => {
 
                 {!scanning && result && (
                   <div className="animate-fade-in-up">
-                    {/* Approved Card */}
-                    {result.status === "APPROVED" ? (
-                      <div className="p-3 rounded mb-4 d-flex align-items-center gap-3" style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid var(--accent-green)" }}>
-                        <FiCheckCircle size={32} className="text-success" style={{ color: "var(--accent-green)" }} />
-                        <div>
-                          <h5 className="m-0 text-success fw-bold" style={{ color: "var(--accent-green)" }}>APPROVED</h5>
-                          <small className="text-secondary">Candidate matches registration roster</small>
-                        </div>
+                    <div className="row mb-4 align-items-center">
+                      {/* Left: Approved / Denied Status Badge */}
+                      <div className="col-8">
+                        {result.status === "APPROVED" ? (
+                          <div className="p-3 rounded d-flex align-items-center gap-3" style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid var(--accent-green)" }}>
+                            <FiCheckCircle size={32} className="text-success" style={{ color: "var(--accent-green)" }} />
+                            <div>
+                              <h5 className="m-0 text-success fw-bold" style={{ color: "var(--accent-green)" }}>APPROVED</h5>
+                              <small className="text-secondary" style={{ fontSize: "0.75rem" }}>Candidate matches registered roster</small>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded d-flex align-items-center gap-3" style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid var(--accent-red)" }}>
+                            <FiXCircle size={32} className="text-danger" style={{ color: "var(--accent-red)" }} />
+                            <div>
+                              <h5 className="m-0 text-danger fw-bold" style={{ color: "var(--accent-red)" }}>DENIED</h5>
+                              <small className="text-secondary" style={{ fontSize: "0.75rem" }}>{result.rejectionReason}</small>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      /* Rejected Card */
-                      <div className="p-3 rounded mb-4 d-flex align-items-center gap-3" style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid var(--accent-red)" }}>
-                        <FiXCircle size={32} className="text-danger" style={{ color: "var(--accent-red)" }} />
-                        <div>
-                          <h5 className="m-0 text-danger fw-bold" style={{ color: "var(--accent-red)" }}>DENIED</h5>
-                          <small className="text-secondary">{result.rejectionReason}</small>
+
+                      {/* Right: Database Photo Reference */}
+                      <div className="col-4 d-flex flex-column align-items-center justify-content-center border-start" style={{ borderColor: "rgba(255,255,255,0.08) !important" }}>
+                        <div className="border rounded overflow-hidden bg-dark d-flex align-items-center justify-content-center" style={{ width: "80px", height: "100px", borderColor: "rgba(255,255,255,0.15)" }}>
+                          {result.idCardImageUrl ? (
+                            <img
+                              src={`${serverBaseUrl}${result.idCardImageUrl}`}
+                              alt="Reference Ref"
+                              className="w-100 h-100 object-fit-cover"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                                e.target.parentElement.innerHTML = '<span class="text-muted" style="font-size:0.65rem">No Photo</span>';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-muted text-center p-1" style={{ fontSize: "0.65rem" }}>No Photo</span>
+                          )}
                         </div>
+                        <span className="text-muted mt-1" style={{ fontSize: "0.65rem", fontWeight: 600 }}>DB Photo Ref</span>
                       </div>
-                    )}
+                    </div>
 
                     {/* Extracted Details Grid */}
                     <div className="d-flex flex-column gap-3">

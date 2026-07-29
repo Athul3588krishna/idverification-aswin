@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "_id": "log_58pkl18bh",
+    "student": "user_q5sii4xuq",
+    "scannedRollNumber": "MCA25393",
+    "scannedName": "Aswin Kumar",
+    "rawOcrText": "MANUAL OVERRIDE CHECK",
+    "matchedDetails": {
+      "name": "Aswin Kumar",
+      "rollNumber": "MCA25393",
+      "course": "MCA",
+      "examCenter": "Hall A - Room 102"
+    },
+    "matchPercentage": 100,
+    "status": "REJECTED",
+    "idCardPhotoPath": null,
+    "verifiedBy": "65b4c123456789abcdef0002",
+    "createdAt": "2026-07-29T14:34:40.190Z",
+    "updatedAt": "2026-07-29T14:34:40.190Z"
+  },
+  {
+    "_id": "log_5c4d9iufr",
+    "student": "user_5zljuwc39",
+    "scannedRollNumber": "MCA22072",
+    "scannedName": "Aswin Kumar",
+    "rawOcrText": "MANUAL OVERRIDE CHECK",
+    "matchedDetails": {
+      "name": "Aswin Kumar",
+      "rollNumber": "MCA22072",
+      "course": "MCA",
+      "examCenter": "Hall A - Room 102"
+    },
+    "matchPercentage": 100,
+    "status": "APPROVED",
+    "idCardPhotoPath": null,
+    "verifiedBy": "65b4c123456789abcdef0002",
+    "createdAt": "2026-07-29T14:36:05.538Z",
+    "updatedAt": "2026-07-29T14:36:05.538Z"
+  }
+]

@@ -32,7 +32,6 @@ import StudentLogin from "./pages/StudentLogin";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
-import AddStudent from "./pages/AddStudent";
 import Verify from "./pages/Verify";
 import VerificationHistory from "./pages/VerificationHistory";
 import NotFound from "./pages/NotFound";
@@ -67,14 +66,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/students/add"
-            element={
-              <PrivateRoute>
-                <AddStudent />
-              </PrivateRoute>
-            }
-          />
+
           <Route
             path="/verify"
             element={

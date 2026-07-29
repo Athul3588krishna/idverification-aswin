@@ -26,7 +26,8 @@ import {
   FiMapPin,
   FiClock,
   FiBookOpen,
-  FiPhone
+  FiPhone,
+  FiAlertTriangle
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth";
@@ -36,9 +37,10 @@ import Loader from "../components/common/Loader";
 import axiosInstance from "../api/axiosInstance";
 import AdmitCard from "../components/AdmitCard";
 import { registerUserAPI, deleteUserAPI, getAllUsersAPI } from "../api/authAPI";
+import { io } from "socket.io-client";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -139,6 +141,49 @@ const Dashboard = () => {
 
     initDashboard();
   }, [user]);
+
+  // Connect to Socket.io for real-time dashboard and approval updates
+  useEffect(() => {
+    if (!user) return;
+
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api";
+    const SOCKET_URL = API_BASE_URL.replace("/api", "");
+    const socket = io(SOCKET_URL);
+
+    socket.on("connect", () => {
+      console.log(`⚡ Real-time channel active: ${socket.id}`);
+      socket.emit("join", user.role);
+      socket.emit("join", `user_${user._id}`);
+    });
+
+    if (user.role === "admin" || user.role === "security_staff") {
+      socket.on("verification_logged", (data) => {
+        // Refresh dashboard metrics
+        fetchStats();
+        if (user.role === "admin") {
+          fetchSecurityStaff();
+        }
+        toast.info(`🔔 Real-time scan: Candidate ${data.rollNumber} checked in.`);
+      });
+
+      socket.on("student_status_updated", (data) => {
+        fetchStats();
+      });
+    }
+
+    if (user.role === "student") {
+      socket.on("student_status_updated", (data) => {
+        if (data.userId === user._id) {
+          toast.success(`🎉 Admin has approved your candidate profile!`);
+          updateUser({ isActive: data.isActive });
+        }
+      });
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user, updateUser]);
 
   // Handle adding new security agent
   const handleAddStaffSubmit = async (e) => {
@@ -323,17 +368,11 @@ const Dashboard = () => {
                         Admin Operations Control
                       </h4>
                       <p className="text-secondary mb-4">
-                        As an administrator, you have complete read, write, and audit access. Add new students to the exam register, activate or suspend staff credentials, and view verification logs in real-time.
+                        As an administrator, you have complete read, write, and audit access. Monitor active candidates, activate or suspend staff credentials, and view verification logs in real-time.
                       </p>
                       <div className="d-flex flex-wrap gap-3">
-                        <Link to="/students/add" className="btn btn-primary-custom d-flex align-items-center gap-2">
-                          <FiUsers size={16} /> Register Student Candidate
-                        </Link>
-                        <Link to="/students" className="btn btn-outline-secondary d-flex align-items-center gap-2" style={{
-                          borderColor: "var(--border-color)",
-                          color: "var(--text-primary)"
-                        }}>
-                          Manage Registered Roster
+                        <Link to="/students" className="btn btn-primary-custom d-flex align-items-center gap-2">
+                          <FiUsers size={16} /> Manage Student Roster
                         </Link>
                         <Link to="/history" className="btn btn-outline-secondary d-flex align-items-center gap-2" style={{
                           borderColor: "var(--border-color)",

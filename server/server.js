@@ -89,8 +89,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ── Start Server ────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
+// ── Start Server with Socket.io ─────────────────────────────
+const http = require("http");
+const { initSocket } = require("./utils/socket");
+
+const PORT = process.env.PORT || 5001; // Force 5001 as defined in .env
 
 const startServer = async () => {
   await connectDB(); // Wait for DB connection before accepting requests
@@ -98,9 +101,12 @@ const startServer = async () => {
   // Seed the default admin account on first run
   await seedAdmin();
 
-  app.listen(PORT, () => {
+  const server = http.createServer(app);
+  initSocket(server);
+
+  server.listen(PORT, () => {
     console.log(
-      `\n🛡️  ExamShield Server running on http://localhost:${PORT}`
+      `\n🛡️  ExamShield Server with Socket.io running on http://localhost:${PORT}`
     );
     console.log(`📋 Environment: ${process.env.NODE_ENV}`);
     console.log(`📡 API Base:    http://localhost:${PORT}/api\n`);

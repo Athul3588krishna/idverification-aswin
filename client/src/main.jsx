@@ -8,11 +8,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-// Global CSS (Design tokens, resets, utilities)
-import "./index.css";
-
 // Bootstrap CSS for responsive grid and base components
 import "bootstrap/dist/css/bootstrap.min.css";
+
+// Global CSS (Design tokens, resets, utilities)
+import "./index.css";
 
 // React Toastify CSS
 import "react-toastify/dist/ReactToastify.css";

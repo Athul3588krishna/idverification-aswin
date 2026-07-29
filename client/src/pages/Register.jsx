@@ -39,10 +39,17 @@ const Register = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // OTP State
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
   const [otp, setOtp] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
 
   // Redirect if already logged in
   useEffect(() => {
@@ -55,67 +62,73 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSendOTP = async () => {
-    if (!formData.email.trim()) {
-      toast.warn("Please enter a valid email address first");
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+
+    const { name, email, password, rollNumber, course, dob, idNumber } = formData;
+
+    // Validate form inputs (excluding OTP)
+    if (!name.trim() || !email.trim() || !password.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !selectedFile) {
+      toast.warn("Please fill in all required fields (marked with *), including your Photo Upload");
       return;
     }
 
     // Email regex validation
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(formData.email.trim())) {
+    if (!emailRegex.test(email.trim())) {
       toast.warn("Please enter a valid email address format");
       return;
     }
 
-    setSendingOTP(true);
-    try {
-      const data = await sendOTPAPI({ email: formData.email.trim() });
-      if (data.success) {
-        setOtpSent(true);
-        toast.success("Verification OTP code sent successfully! Check your email.");
+    // If OTP modal is not shown yet, send OTP first and open modal
+    if (!showOtpModal) {
+      setSendingOTP(true);
+      try {
+        const data = await sendOTPAPI({ email: email.trim() });
+        if (data.success) {
+          setOtpSent(true);
+          setShowOtpModal(true);
+          toast.success("Verification OTP code sent to your email! Please check.");
+        }
+      } catch (err) {
+        const message = err.response?.data?.message || "Failed to send verification OTP.";
+        toast.error(message);
+      } finally {
+        setSendingOTP(false);
       }
-    } catch (err) {
-      const message = err.response?.data?.message || "Failed to send verification OTP.";
-      toast.error(message);
-    } finally {
-      setSendingOTP(false);
+      return;
     }
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { name, email, password, rollNumber, course, dob, idNumber } = formData;
-
-    if (!name.trim() || !email.trim() || !password.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !otp.trim()) {
-      toast.warn("Please fill in all required fields (marked with *), including the Email OTP");
+    // If OTP modal is shown, verify OTP and submit registration
+    if (!otp.trim() || otp.trim().length !== 6) {
+      toast.warn("Please enter the 6-digit verification code");
       return;
     }
 
     setIsLoading(true);
     try {
-      const payload = {
-        name,
-        email: email.trim().toLowerCase(),
-        password,
-        role: "student",
-        phone: formData.phone || undefined,
-        rollNumber: rollNumber.trim().toUpperCase(),
-        course,
-        semester: formData.semester,
-        dob,
-        idNumber: idNumber.trim(),
-        examCenter: formData.examCenter,
-        examSubject: formData.examSubject,
-        examDate: formData.examDate,
-        examTime: formData.examTime,
-        otp: otp.trim(),
-      };
+      const payload = new FormData();
+      payload.append("name", name.trim());
+      payload.append("email", email.trim().toLowerCase());
+      payload.append("password", password);
+      payload.append("role", "student");
+      if (formData.phone) payload.append("phone", formData.phone.trim());
+      payload.append("rollNumber", rollNumber.trim().toUpperCase());
+      payload.append("course", course);
+      payload.append("semester", formData.semester);
+      payload.append("dob", dob);
+      payload.append("idNumber", idNumber.trim());
+      payload.append("examCenter", formData.examCenter);
+      payload.append("examSubject", formData.examSubject);
+      payload.append("examDate", formData.examDate);
+      payload.append("examTime", formData.examTime);
+      payload.append("otp", otp.trim());
+      payload.append("idCardImage", selectedFile);
 
       await studentRegisterAPI(payload);
 
       toast.success("Registration successful! Log in to view your approval status. 🎉", { autoClose: 6000 });
+      setShowOtpModal(false);
       navigate("/student/login");
     } catch (err) {
       const message = err.response?.data?.message || "Registration failed. Please try again.";
@@ -153,7 +166,7 @@ const Register = () => {
             <h5 className="text-white-50 border-bottom border-secondary pb-2 mb-3">1. Personal Details</h5>
             
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-12 mb-3">
                 <label className="form-label-custom">Full Name *</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><FiUser size={16} /></span>
@@ -169,59 +182,26 @@ const Register = () => {
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="col-md-6 mb-3">
+            <div className="row">
+              <div className="col-12 mb-3">
                 <label className="form-label-custom">Email Address *</label>
-                <div className="d-flex gap-2">
-                  <div className="input-wrapper w-100">
-                    <span className="input-icon"><FiMail size={16} /></span>
-                    <input
-                      type="email"
-                      name="email"
-                      className="form-control-custom with-icon"
-                      placeholder="yourname@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      disabled={isLoading || otpSent}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="btn btn-primary-custom px-3 py-2 btn-sm text-nowrap"
-                    onClick={handleSendOTP}
-                    disabled={sendingOTP || !formData.email.trim() || isLoading}
-                    style={{ height: "45px" }}
-                  >
-                    {sendingOTP ? "Sending..." : otpSent ? "Resend OTP" : "Send OTP"}
-                  </button>
+                <div className="input-wrapper">
+                  <span className="input-icon"><FiMail size={16} /></span>
+                  <input
+                    type="email"
+                    name="email"
+                    className="form-control-custom with-icon"
+                    placeholder="yourname@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={isLoading || showOtpModal}
+                    required
+                  />
                 </div>
               </div>
             </div>
-
-            {otpSent && (
-              <div className="row">
-                <div className="col-12 mb-3">
-                  <div className="p-3 rounded border border-info animate-fade-in-up" style={{ background: "rgba(13, 202, 240, 0.05)" }}>
-                    <label className="form-label-custom fw-bold text-info mb-2">Enter the 6-Digit Email OTP Code *</label>
-                    <input
-                      type="text"
-                      className="form-control-custom text-center text-white"
-                      placeholder="Enter OTP Code (e.g. 482910)"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      maxLength={6}
-                      disabled={isLoading}
-                      style={{ fontSize: "1.2rem", letterSpacing: "4px", fontWeight: "bold", background: "rgba(0,0,0,0.2)" }}
-                      required
-                    />
-                    <small className="text-info mt-2 d-block">
-                      Check your inbox/spam folder for the verification code. If in development/offline mode, the code is printed in the server console log!
-                    </small>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="row">
               <div className="col-md-6 mb-3">
@@ -255,6 +235,25 @@ const Register = () => {
                     disabled={isLoading}
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-12 mb-3">
+                <label className="form-label-custom">ID Card Reference Photo / Passport Photo *</label>
+                <div className="input-wrapper">
+                  <input
+                    type="file"
+                    name="idCardImage"
+                    className="form-control-custom text-white py-2"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required
+                    disabled={isLoading}
+                    style={{ background: "rgba(0,0,0,0.2)" }}
+                  />
+                </div>
+                <small className="text-muted mt-1 d-block">This image/photo will be displayed to security personnel during gate verification checks.</small>
               </div>
             </div>
 
@@ -408,16 +407,14 @@ const Register = () => {
             <button
               type="submit"
               className="btn-custom mt-4 w-100 py-3 d-flex align-items-center justify-content-center"
-              disabled={isLoading}
+              disabled={isLoading || sendingOTP}
             >
-              {isLoading ? (
+              {sendingOTP ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Registering...
+                  Sending Verification Code...
                 </>
-              ) : (
-                "Complete Registration"
-              )}
+              ) : "Verify & Complete Registration"}
             </button>
           </form>
 
@@ -427,6 +424,57 @@ const Register = () => {
           </div>
         </div>
       </div>
+
+      {/* Verification OTP Modal Overlay */}
+      {showOtpModal && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center animate-fade-in" style={{ background: "rgba(0,0,0,0.85)", zIndex: 1050, backdropFilter: "blur(12px)" }}>
+          <div className="glass-card p-4 text-center animate-fade-in-up" style={{ maxWidth: "450px", width: "90%", border: "1px solid rgba(255, 255, 255, 0.15)", background: "rgba(20, 20, 30, 0.9)" }}>
+            <h4 className="text-white mb-2 fw-bold">Email Verification</h4>
+            <p className="text-white-50 small mb-4">We have sent a 6-digit verification code to <strong className="text-white">{formData.email}</strong>. Please enter the code below to verify your email.</p>
+            
+            <div className="mb-4">
+              <input
+                type="text"
+                className="form-control-custom text-center text-white"
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                maxLength={6}
+                required
+                style={{ fontSize: "1.6rem", letterSpacing: "6px", fontWeight: "bold", background: "rgba(0,0,0,0.3)" }}
+              />
+              <small className="text-info mt-3 d-block">
+                Check spam if you don't see it. In offline dev mode, the code is printed in the server console log!
+              </small>
+            </div>
+            
+            <div className="d-flex gap-2">
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-50 py-2 text-white"
+                style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}
+                onClick={() => setShowOtpModal(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary-custom w-50 py-2 d-flex align-items-center justify-content-center gap-2"
+                onClick={() => handleSubmit()}
+                disabled={isLoading || otp.length !== 6}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Verifying...
+                  </>
+                ) : "Verify & Submit"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

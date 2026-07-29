@@ -33,6 +33,7 @@
 
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/uploadMiddleware");
 
 const {
   loginUser,
@@ -66,7 +67,7 @@ router.post("/login", loginUser);
  * POST /api/auth/student-register
  * Public registration endpoint for students.
  */
-router.post("/student-register", studentRegister);
+router.post("/student-register", upload.single("idCardImage"), studentRegister);
 
 /**
  * POST /api/auth/send-otp
@@ -102,7 +103,7 @@ router.put("/password", protect, changePassword);
  * Admin creates new accounts for staff or students.
  * Accepts: { name, email, password, role, phone, ...studentFields }
  */
-router.post("/register", protect, authorize("admin"), registerUser);
+router.post("/register", protect, authorize("admin"), upload.single("idCardImage"), registerUser);
 
 /**
  * GET /api/auth/users

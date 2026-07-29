@@ -249,6 +249,14 @@ const hydrateDocument = (obj, modelName) => {
       const users = loadUsers();
       const index = users.findIndex((u) => u._id === obj._id);
       obj.updatedAt = new Date().toISOString();
+
+      // Copy all updated properties from the instance (this) to the database object (obj)
+      for (const key in this) {
+        if (typeof this[key] !== "function") {
+          obj[key] = this[key];
+        }
+      }
+
       if (index !== -1) {
         users[index] = obj;
       } else {

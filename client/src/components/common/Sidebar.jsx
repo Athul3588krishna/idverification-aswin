@@ -61,11 +61,6 @@ const Sidebar = () => {
           icon: <FiUsers size={18} />
         },
         {
-          path: "/students/add",
-          label: "Register Student",
-          icon: <FiUserPlus size={18} />
-        },
-        {
           path: "/history",
           label: "Verification Logs",
           icon: <FiList size={18} />

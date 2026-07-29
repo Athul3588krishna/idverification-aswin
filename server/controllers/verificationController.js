@@ -135,6 +135,18 @@ const verifyStudentCard = asyncHandler(async (req, res) => {
 
   const savedLog = await VerificationLog.create(logData);
 
+  // Emit real-time log event via Socket.io
+  try {
+    const { emitEvent } = require("../utils/socket");
+    emitEvent("verification_logged", {
+      log: savedLog,
+      rollNumber: logData.scannedRollNumber,
+      studentId: logData.student
+    });
+  } catch (err) {
+    console.error("Socket emit error:", err.message);
+  }
+
   // Return verification result summary
   res.status(201).json({
     success: true,
@@ -147,6 +159,7 @@ const verifyStudentCard = asyncHandler(async (req, res) => {
       scannedName: logData.scannedName,
       matchedDetails: logData.matchedDetails,
       idCardPhotoPath: imageRelativeUrl,
+      idCardImageUrl: matchedStudent?.studentProfile?.idCardImageUrl || null,
       logId: savedLog._id
     }
   });
@@ -296,6 +309,18 @@ const verifyStudentCardManual = asyncHandler(async (req, res) => {
 
   const savedLog = await require("../models/VerificationLog").create(logData);
 
+  // Emit real-time log event via Socket.io
+  try {
+    const { emitEvent } = require("../utils/socket");
+    emitEvent("verification_logged", {
+      log: savedLog,
+      rollNumber: logData.scannedRollNumber,
+      studentId: logData.student
+    });
+  } catch (err) {
+    console.error("Socket emit error:", err.message);
+  }
+
   res.status(201).json({
     success: true,
     message: status === "APPROVED" ? "Manual Verification Success! Entry Approved." : `Entry Denied: ${rejectionReason}`,
@@ -307,6 +332,7 @@ const verifyStudentCardManual = asyncHandler(async (req, res) => {
       scannedName: logData.scannedName,
       matchedDetails: logData.matchedDetails,
       idCardPhotoPath: null,
+      idCardImageUrl: student?.studentProfile?.idCardImageUrl || null,
       logId: savedLog._id
     }
   });
