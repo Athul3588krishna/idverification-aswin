@@ -211,6 +211,7 @@ const getVerificationLogs = asyncHandler(async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 const getStats = asyncHandler(async (req, res) => {
   const totalStudents = await User.countDocuments({ role: "student" });
+  const pendingStudents = await User.countDocuments({ role: "student", isActive: false });
   const totalStaff = await User.countDocuments({ role: "security_staff" });
   
   // Total stats from DB logs
@@ -238,6 +239,7 @@ const getStats = asyncHandler(async (req, res) => {
     success: true,
     stats: {
       totalStudents,
+      pendingStudents,
       totalStaff,
       totalScans,
       successScans,

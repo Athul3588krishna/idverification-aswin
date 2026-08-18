@@ -148,6 +148,14 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new Error("Roll number and course are required for student accounts");
     }
 
+    if (idNumber) {
+      const cleanIdNumber = idNumber.trim().replace(/\D/g, "");
+      if (cleanIdNumber.length !== 12) {
+        res.status(400);
+        throw new Error("Aadhaar number must be exactly 12 numeric digits");
+      }
+    }
+
     // Check for duplicate roll number
     const existingRoll = await User.findOne({
       "studentProfile.rollNumber": rollNumber.toUpperCase(),
@@ -473,6 +481,13 @@ const studentRegister = asyncHandler(async (req, res) => {
     throw new Error("Name, email, password, roll number, course, DOB, ID number, and OTP are required for student registration");
   }
 
+  // Validate 12-digit Aadhaar number format
+  const cleanIdNumber = idNumber ? idNumber.trim().replace(/\D/g, "") : "";
+  if (cleanIdNumber.length !== 12) {
+    res.status(400);
+    throw new Error("Aadhaar number must be exactly 12 numeric digits");
+  }
+
   // Verify OTP code
   const { verifyOTP } = require("../utils/otpStore");
   if (!verifyOTP(email, otp)) {
@@ -492,7 +507,7 @@ const studentRegister = asyncHandler(async (req, res) => {
   const studentProfile = {
     rollNumber: rollNumber.toUpperCase(),
     course,
-    semester: Number(semester) || 1,
+    semester: Math.min(Math.max(Number(semester) || 1, 1), 20),
     dob,
     idNumber,
     examSubject: examSubject || "Entrance Examination 2026",
@@ -502,6 +517,9 @@ const studentRegister = asyncHandler(async (req, res) => {
     idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
   };
 
+  const { getAutoApprove } = require("../utils/systemConfig");
+  const isAutoApproved = getAutoApprove();
+
   const user = await User.create({
     name,
     email,
@@ -509,12 +527,14 @@ const studentRegister = asyncHandler(async (req, res) => {
     phone: phone || null,
     role: targetRole,
     studentProfile,
-    isActive: false, // Default to inactive (pending admin approval)
+    isActive: isAutoApproved,
   });
 
   res.status(201).json({
     success: true,
-    message: "Registration successful! Pending Admin approval to download hall ticket.",
+    message: isAutoApproved
+      ? "Registration successful! Account automatically approved. Log in to access your admit card."
+      : "Registration successful! Pending Admin approval to download hall ticket.",
     user: user.toPublicJSON(),
   });
 });

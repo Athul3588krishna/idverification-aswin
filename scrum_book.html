@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EXAMSHIELD - Scrum Book Submission 2 (CIE 2)</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 15mm 16mm 15mm;
+  }
+  
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.45;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+  }
+
+  .header-running {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.5pt;
+    font-style: italic;
+    color: #64748b;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 14px;
+  }
+
+  .footer-running {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.5pt;
+    color: #64748b;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 6px;
+    margin-top: 25px;
+    break-inside: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .doc-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 5px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .doc-subtitle {
+    font-size: 12.5pt;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .divider-main {
+    height: 2.5px;
+    background-color: #1e40af;
+    margin-bottom: 16px;
+    border: none;
+  }
+
+  .divider-thin {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 14px 0;
+    border: none;
+  }
+
+  .section-header {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 4px;
+    margin-top: 20px;
+    margin-bottom: 14px;
+    break-after: avoid;
+  }
+
+  .sub-header {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #1e40af;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    break-after: avoid;
+  }
+
+  .profile-section-title {
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: #1e40af;
+    text-transform: uppercase;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  ul.profile-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0 0 12px 0;
+  }
+
+  ul.profile-list li {
+    margin-bottom: 4px;
+    font-size: 10pt;
+  }
+
+  ul.profile-list strong {
+    color: #0f172a;
+  }
+
+  table.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px 0;
+    font-size: 9.5pt;
+    break-inside: avoid;
+  }
+
+  table.custom-table th, table.custom-table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 9px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  table.custom-table th {
+    background-color: #f8fafc;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .code-pill {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8.5pt;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+  }
+
+  .code-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8.5pt;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #1e293b;
+    margin: 8px 0 12px 0;
+    line-height: 1.4;
+    break-inside: avoid;
+  }
+
+  .signature-area {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-size: 10pt;
+    font-weight: 600;
+    break-inside: avoid;
+  }
+
+  .signature-line {
+    margin-bottom: 10px;
+  }
+
+  .dod-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 8px 0 12px 0;
+  }
+
+  .dod-list li {
+    margin-bottom: 6px;
+    font-size: 9.5pt;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .check-icon {
+    color: #64748b;
+    font-weight: bold;
+  }
+
+  .user-story-card {
+    margin-bottom: 14px;
+    break-inside: avoid;
+  }
+
+  .user-story-title {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+  }
+
+  .story-body {
+    font-size: 9.5pt;
+    margin-left: 12px;
+    line-height: 1.4;
+  }
+
+  .story-body p {
+    margin: 2px 0;
+  }
+
+  .ac-list {
+    margin: 3px 0 3px 18px;
+    padding-left: 0;
+  }
+
+  .ac-list li {
+    margin-bottom: 2px;
+  }
+
+  .epic-title {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #1e40af;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    break-after: avoid;
+  }
+</style>
+</head>
+<body>
+
+<!-- SECTION COVER & EVALUATION SHEET -->
+<div>
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="doc-title">
+    EXAMSHIELD: OCR-BASED IDENTITY VERIFICATION AND EXAM AUTHENTICATION SYSTEM
+  </div>
+  <div class="doc-subtitle">
+    SCRUM BOOK: SUBMISSION - 2 (CIE 2)
+  </div>
+  <div class="divider-main"></div>
+
+  <div class="profile-section-title">STUDENT PROFILE</div>
+  <ul class="profile-list">
+    <li><strong>Name of Student:</strong> ATHUL KRISHNA R</li>
+    <li><strong>Register Number:</strong> MEA24MCA-XXXX</li>
+    <li><strong>Course & Batch:</strong> Master of Computer Applications (MCA)</li>
+    <li><strong>Semester:</strong> S3 (Third Semester)</li>
+    <li><strong>Department:</strong> Department of Computer Applications</li>
+    <li><strong>College:</strong> MEA Engineering College, Perinthalmanna</li>
+  </ul>
+
+  <div class="profile-section-title">EVALUATION PROFILE</div>
+  <ul class="profile-list">
+    <li><strong>Submission Date:</strong> 18/08/2026</li>
+    <li><strong>Evaluation Event:</strong> Continuous Internal Evaluation 2 (CIE 2)</li>
+    <li><strong>Project Guide:</strong> Ms. Prajina K (Assistant Professor)</li>
+    <li><strong>Project Co-ordinator:</strong> Mrs. Sruti Sudevan (HOD & Assistant Professor)</li>
+  </ul>
+
+  <div class="divider-thin"></div>
+
+  <div class="profile-section-title">EVALUATION & SIGNATURE SHEET</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 48%;">Evaluation Criterion</th>
+        <th style="width: 17%;">Maximum Marks</th>
+        <th style="width: 17%;">Marks Awarded</th>
+        <th style="width: 18%;">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Updated Sprint Details & DoD</strong></td>
+        <td>5</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Database Design & Collections</strong></td>
+        <td>5</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Data Flow Diagram (DFD - Up to Level 2)</strong></td>
+        <td>5</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>User Stories & Story Points</strong></td>
+        <td>5</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Total Marks</strong></td>
+        <td><strong>20</strong></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="signature-area">
+    <div class="signature-line"><strong>Signature of Project Guide:</strong> _________________________</div>
+    <div class="signature-line"><strong>Date of Evaluation:</strong> _________________________</div>
+  </div>
+</div>
+
+<!-- SECTION 1: UPDATED SPRINT DETAILS -->
+<div class="page-break">
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="section-header">1. UPDATED SPRINT DETAILS</div>
+  <p>The <strong>ExamShield</strong> platform was developed following the <strong>Agile Scrum Framework</strong> across four sprints. Below is the official Sprint Tracking Log formatted according to the evaluation requirements:</p>
+
+  <div class="sub-header">📅 Sprint - 1</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 11%;">Module</th>
+        <th style="width: 26%;">Task</th>
+        <th style="width: 14%;">Pending task if any</th>
+        <th style="width: 13%;">Hours of Completion</th>
+        <th style="width: 15%;">Expected date of Completion</th>
+        <th style="width: 14%;">Actual date of Completion</th>
+        <th style="width: 7%;">Reason for delay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Security Staff</strong></td>
+        <td>Email-OTP Registration</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>14/07/2026</td>
+        <td>14/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Security Staff</strong></td>
+        <td>JWT - Login & Role Auth</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>16/07/2026</td>
+        <td>16/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Master Admin Seeding Script</td>
+        <td>-</td>
+        <td>1 hr</td>
+        <td>17/07/2026</td>
+        <td>17/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Core</strong></td>
+        <td>Express & Mongoose Server Setup</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>18/07/2026</td>
+        <td>18/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Core</strong></td>
+        <td>Socket.io Real-Time Event Server</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>21/07/2026</td>
+        <td>21/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Core</strong></td>
+        <td>Protected Route Middleware (protect, authorize)</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>24/07/2026</td>
+        <td>24/07/2026</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-header">📅 Sprint - 2</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 11%;">Module</th>
+        <th style="width: 26%;">Task</th>
+        <th style="width: 14%;">Pending task if any</th>
+        <th style="width: 13%;">Hours of Completion</th>
+        <th style="width: 15%;">Expected date of Completion</th>
+        <th style="width: 14%;">Actual date of Completion</th>
+        <th style="width: 7%;">Reason for delay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Student</strong></td>
+        <td>Multer Drag-Drop ID Photo Upload</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>26/07/2026</td>
+        <td>26/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Student</strong></td>
+        <td>Student Registration & Profile API</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>28/07/2026</td>
+        <td>28/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Student</strong></td>
+        <td>Bulk Student CSV Import & Parser</td>
+        <td>-</td>
+        <td>4 hr</td>
+        <td>30/07/2026</td>
+        <td>30/07/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Student Master CRUD & Filter UI</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>01/08/2026</td>
+        <td>01/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Student</strong></td>
+        <td>Digital Hall Ticket & Exam Card View</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>03/08/2026</td>
+        <td>03/08/2026</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-header">📅 Sprint - 3</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 11%;">Module</th>
+        <th style="width: 26%;">Task</th>
+        <th style="width: 14%;">Pending task if any</th>
+        <th style="width: 13%;">Hours of Completion</th>
+        <th style="width: 15%;">Expected date of Completion</th>
+        <th style="width: 14%;">Actual date of Completion</th>
+        <th style="width: 7%;">Reason for delay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Verifier</strong></td>
+        <td>Tesseract.js OCR Engine Integration</td>
+        <td>-</td>
+        <td>5 hr</td>
+        <td>05/08/2026</td>
+        <td>05/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Verifier</strong></td>
+        <td>Live Gate Scanner & Camera Feed UI</td>
+        <td>-</td>
+        <td>4 hr</td>
+        <td>07/08/2026</td>
+        <td>07/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Verifier</strong></td>
+        <td>Text Extraction & Regex Normalization</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>09/08/2026</td>
+        <td>09/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Verifier</strong></td>
+        <td>Multi-Field Match Scoring Algorithm</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>11/08/2026</td>
+        <td>11/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Verifier</strong></td>
+        <td>Verification Decision & Rejection Flow</td>
+        <td>-</td>
+        <td>4 hr</td>
+        <td>13/08/2026</td>
+        <td>13/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Audit Log</strong></td>
+        <td>Verification Log Entry Persistence</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>14/08/2026</td>
+        <td>14/08/2026</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-header">📅 Sprint - 4</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 11%;">Module</th>
+        <th style="width: 26%;">Task</th>
+        <th style="width: 14%;">Pending task if any</th>
+        <th style="width: 13%;">Hours of Completion</th>
+        <th style="width: 15%;">Expected date of Completion</th>
+        <th style="width: 14%;">Actual date of Completion</th>
+        <th style="width: 7%;">Reason for delay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Real-Time Incident Feed (Socket.io)</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>15/08/2026</td>
+        <td>15/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Verification Stats & Distribution Charts</td>
+        <td>-</td>
+        <td>2 hr</td>
+        <td>16/08/2026</td>
+        <td>16/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Comprehensive Verification History Table</td>
+        <td>-</td>
+        <td>4 hr</td>
+        <td>17/08/2026</td>
+        <td>17/08/2026</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>CSV Audit Trail Report Export</td>
+        <td>-</td>
+        <td>3 hr</td>
+        <td>18/08/2026</td>
+        <td>18/08/2026</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sub-header">📊 Sprint Velocity & Burn-down Summary</div>
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 15%;">Sprint</th>
+        <th style="width: 45%;">Module Focus</th>
+        <th style="width: 13%;">Planned SP</th>
+        <th style="width: 14%;">Completed SP</th>
+        <th style="width: 13%;">Velocity Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Sprint 1</strong></td>
+        <td>Security Staff Auth & System Setup</td>
+        <td>19</td>
+        <td>19</td>
+        <td>On Target</td>
+      </tr>
+      <tr>
+        <td><strong>Sprint 2</strong></td>
+        <td>Student Master Data & ID Photo Uploads</td>
+        <td>20</td>
+        <td>20</td>
+        <td>On Target</td>
+      </tr>
+      <tr>
+        <td><strong>Sprint 3</strong></td>
+        <td>Tesseract OCR Scan Engine & Gate Verification</td>
+        <td>21</td>
+        <td>21</td>
+        <td>On Target</td>
+      </tr>
+      <tr>
+        <td><strong>Sprint 4</strong></td>
+        <td>Real-Time Security Dashboard & Audit Logs</td>
+        <td>18</td>
+        <td>18</td>
+        <td>On Target</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="avoid-break">
+    <p><strong>Definition of Done (DoD) Checklist:</strong></p>
+    <ul class="dod-list">
+      <li><span class="check-icon">☑</span> Code adheres to clean architecture with standard Express routes and React hooks.</li>
+      <li><span class="check-icon">☑</span> Password fields are hashed with Bcrypt (cost factor 12) prior to persistence.</li>
+      <li><span class="check-icon">☑</span> API routes enforce JWT authorization middleware (<span class="code-pill">protect</span>, <span class="code-pill">authorize</span>).</li>
+      <li><span class="check-icon">☑</span> Tesseract OCR engine accurately extracts text and validates candidate roll numbers.</li>
+      <li><span class="check-icon">☑</span> All manual UAT workflows (Student, Admin, Security Staff) pass verification tests without runtime exceptions.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 2: DATABASE DESIGN / COLLECTIONS -->
+<div class="page-break">
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="section-header">2. DATABASE DESIGN / COLLECTIONS</div>
+  <p>The backend utilizes <strong>MongoDB</strong> with <strong>Mongoose ORM</strong> to enforce schema validation. The primary collections and their attributes are detailed below:</p>
+
+  <div class="code-box">┌─────────────────┐ 1:N ┌──────────────────────┐
+│      User       │ ◄───│   VerificationLog    │
+│ (Admin/Staff/   │     │ (Candidate Entry Scan│
+│    Student)     │     │     Audit Log)       │
+└────────┬────────┘     └──────────────────────┘
+         │ 1:N
+         ▼
+┌─────────────────┐
+│     OTPStore    │
+│  (In-Memory/    │
+│   Temp Storage) │
+└─────────────────┘</div>
+
+  <div class="sub-header">2.1 Collection: users ( <span class="code-pill">User.js</span> )</div>
+  <p>Stores user profiles for Students, Security Staff (Verifiers), and Administrators.</p>
+
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 22%;">Field</th>
+        <th style="width: 12%;">Type</th>
+        <th style="width: 33%;">Constraints</th>
+        <th style="width: 33%;">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">_id</span></td>
+        <td>ObjectId</td>
+        <td>Primary Key, Auto</td>
+        <td>Unique user identifier</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">name</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Full name of the user</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">email</span></td>
+        <td>String</td>
+        <td>Required, Unique, Lowercase</td>
+        <td>Email address for login</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">password</span></td>
+        <td>String</td>
+        <td>Required, Min length 6</td>
+        <td>Hashed password (Bcrypt)</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">role</span></td>
+        <td>String</td>
+        <td>Enum: <span class="code-pill">['admin', 'security_staff', 'student']</span></td>
+        <td>User access role</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">phone</span></td>
+        <td>String</td>
+        <td>Match: 10 digits, Default: null</td>
+        <td>Contact phone number</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">studentProfile</span></td>
+        <td>Object</td>
+        <td>Populated if <span class="code-pill">role === 'student'</span></td>
+        <td>Student exam details</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">isActive</span></td>
+        <td>Boolean</td>
+        <td>Default: <span class="code-pill">true</span></td>
+        <td>Account active status</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">createdBy</span></td>
+        <td>ObjectId</td>
+        <td>Ref: <span class="code-pill">'User'</span>, Default: null</td>
+        <td>Admin who created account</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>📄 <strong>Sample Document ( users ):</strong></p>
+  <div class="code-box">{
+  _id: ObjectId('6a6959be4b8992b198eddbc0'),
+  name: 'Athul Krishna R',
+  email: 'athul98517772@gmail.com',
+  password: '$2a$12$w8.9Xj1s4rZ6Qk9Y... (Bcrypt Hashed)',
+  phone: '9876543210',
+  role: 'student',
+  studentProfile: {
+    rollNumber: 'MEA24MCA001',
+    course: 'Master of Computer Applications (MCA)',
+    semester: 3,
+    examCenter: 'Main Block - Room 102',
+    department: 'Computer Applications',
+    admissionYear: 2024,
+    dob: '2002-05-14',
+    idNumber: 'AADHAAR-8921-4567',
+    examSubject: 'Advanced Web Technologies',
+    examDate: '2026-08-18',
+    examTime: '10:00 AM - 01:00 PM',
+    idCardImageUrl: '/uploads/student_cards/card_mea24mca001.png'
+  },
+  isActive: true,
+  createdBy: ObjectId('6a6959be4b8992b198eddba1'),
+  createdAt: ISODate('2026-07-28T10:15:30.000Z'),
+  updatedAt: ISODate('2026-07-29T01:39:10.000Z'),
+  __v: NumberInt('0')
+}</div>
+
+  <div class="sub-header">2.2 Collection: verificationlogs ( <span class="code-pill">VerificationLog.js</span> )</div>
+  <p>Stores audit logs for candidate scan attempts, extracted OCR text, match scores, and entry gate decisions.</p>
+
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 25%;">Field</th>
+        <th style="width: 12%;">Type</th>
+        <th style="width: 30%;">Constraints</th>
+        <th style="width: 33%;">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">_id</span></td>
+        <td>ObjectId</td>
+        <td>Primary Key, Auto</td>
+        <td>Unique log record ID</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">student</span></td>
+        <td>ObjectId</td>
+        <td>Ref: <span class="code-pill">'User'</span>, Default: null</td>
+        <td>Matched candidate reference</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">scannedRollNumber</span></td>
+        <td>String</td>
+        <td>Trim, Default: <span class="code-pill">""</span></td>
+        <td>OCR extracted roll number</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">scannedName</span></td>
+        <td>String</td>
+        <td>Trim, Default: <span class="code-pill">""</span></td>
+        <td>OCR extracted candidate name</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">rawOcrText</span></td>
+        <td>String</td>
+        <td>Default: <span class="code-pill">""</span></td>
+        <td>Full raw OCR text output</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">matchedDetails</span></td>
+        <td>Object</td>
+        <td>Sub-fields: name, rollNumber, course</td>
+        <td>Snapshot of DB match info</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">matchPercentage</span></td>
+        <td>Number</td>
+        <td>Required, Range: 0 to 100</td>
+        <td>Fuzzy match accuracy score</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">status</span></td>
+        <td>String</td>
+        <td>Enum: <span class="code-pill">['APPROVED', 'REJECTED']</span></td>
+        <td>Entry gate decision status</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">rejectionReason</span></td>
+        <td>String</td>
+        <td>Trim, Default: <span class="code-pill">""</span></td>
+        <td>Reason for entry denial</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">idCardPhotoPath</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Path to uploaded scan image</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">verifiedBy</span></td>
+        <td>ObjectId</td>
+        <td>Required, Ref: <span class="code-pill">'User'</span></td>
+        <td>Security staff / Verifier ID</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>📄 <strong>Sample Document ( verificationlogs ):</strong></p>
+  <div class="code-box">{
+  _id: ObjectId('6a6959be4b8992b198eddbd2'),
+  student: ObjectId('6a6959be4b8992b198eddbc0'),
+  scannedRollNumber: 'MEA24MCA001',
+  scannedName: 'ATHUL KRISHNA R',
+  rawOcrText: 'MEA ENGINEERING COLLEGE PERINTHALMANNA \nNAME: ATHUL KRISHNA R \nROLL NO: MEA24MCA001 \nCOURSE: MCA',
+  matchedDetails: {
+    name: 'Athul Krishna R',
+    rollNumber: 'MEA24MCA001',
+    course: 'Master of Computer Applications (MCA)',
+    examCenter: 'Main Block - Room 102'
+  },
+  matchPercentage: 95,
+  status: 'APPROVED',
+  rejectionReason: '',
+  idCardPhotoPath: '/uploads/scan_proofs/scan_20260818_100122.png',
+  verifiedBy: ObjectId('6a6959be4b8992b198eddbbc'),
+  createdAt: ISODate('2026-08-18T04:31:22.000Z'),
+  updatedAt: ISODate('2026-08-18T04:31:22.000Z'),
+  __v: NumberInt('0')
+}</div>
+
+  <div class="sub-header">2.3 Collection: otps ( <span class="code-pill">otpStore.js / Otp</span> )</div>
+  <p>Temporary storage for One-Time Passwords during user registration and password resets.</p>
+
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th style="width: 22%;">Field</th>
+        <th style="width: 12%;">Type</th>
+        <th style="width: 33%;">Constraints</th>
+        <th style="width: 33%;">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">_id</span></td>
+        <td>ObjectId</td>
+        <td>Primary Key, Auto</td>
+        <td>Unique OTP record ID</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">email</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Target user email</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">otp</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>6-digit verification code</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">name</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Temporary registration name</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">password</span></td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Temporary password string</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">createdAt</span></td>
+        <td>Date</td>
+        <td>Default: Date.now , Expires: 300s (5m)</td>
+        <td>Auto-deleted TTL index</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>📄 <strong>Sample Document ( otps ):</strong></p>
+  <div class="code-box">{
+  _id: ObjectId('6a6959be4b8992b198eddbf0'),
+  email: 'security.officer@examshield.org',
+  otp: '482910',
+  name: 'Gate Officer 1',
+  password: '$2a$12$e7.2Wk3s...',
+  createdAt: ISODate('2026-07-29T01:35:00.000Z')
+}</div>
+</div>
+
+<!-- SECTION 3: DATA FLOW DIAGRAM (DFD) -->
+<div class="page-break">
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="section-header">3. DATA FLOW DIAGRAM (DFD)</div>
+  <p>The Data Flow Diagrams (DFD) represent the logical movement of data throughout the <strong>ExamShield OCR-Based Identity Verification System</strong> across Level 0, Level 1 (Role-specific), and Level 2 detailed process decompositions.</p>
+
+  <div class="sub-header">3.1 Level 0 - System Context Diagram</div>
+  <p>The Level 0 Context Diagram depicts the primary boundary of the ExamShield system and its data flow exchanges with External Entities (Student, Security Staff / Verifier, Municipal/Exam Admin).</p>
+
+  <div class="code-box"> ┌──────────────┐
+ │   Student    │
+ └──────┬───────┘
+  Request │ Response (Hall Ticket/
+(Reg/Profile)│ Exam Status)
+         ▼
+ ┌──────────────┐ ┌──────────────┐ ┌───────────────────┐
+ │    Admin     │───────►│  ExamShield  │◄───────│  Security Staff   │
+ └──────────────┘◄───────│    System    │───────►└───────────────────┘
+  Config & Audit  Logs & Reports  Scan Feed & Pass/Fail Status</div>
+
+  <div class="code-box">graph TD
+    Student[👤 Student] -->|Register, Login & View Hall Ticket| System((🌐 ExamShield Platform))
+    System -->|Exam Center, Roll Info & Status| Student
+
+    Admin[🛡️ System Admin] -->|Student CSV Batch, Staff Accounts & Rules| System
+    System -->|Audit Logs, Verification Statistics & Analytics| Admin
+
+    Staff[👮 Security Staff] -->|ID Photo Scan Upload & Gate Request| System
+    System -->|OCR Extract Match Result, Pass/Fail Decision| Staff</div>
+
+  <div class="sub-header">3.2 Level 1 - Admin</div>
+  <p>Decomposes administrative functionality. The Admin authenticates via the User Table and manages students, verifiers, scan logs, analytics, and CSV exports.</p>
+
+  <div class="code-box"> ┌──────────────┐
+ ┌──►│  User Table  │
+ │ └──────────────┘
+ ▼
+┌───────┐ ┌───────┐ ┌──────────────────────┐ ┌─────────────────┐
+│ Admin │────►│ Login │───►│ Manage Students      │◄──►│ Students Store  │
+└───────┘ └───────┘ ├──────────────────────┤ └─────────────────┘
+                    │ Manage Staff         │◄──►│ Staff Store     │
+                    ├──────────────────────┤ └─────────────────┘
+                    │ View Scan Audit Logs │◄──►│ Verifications   │
+                    ├──────────────────────┤ └─────────────────┘
+                    │ Export CSV Reports   │◄──►│ Export Store    │
+                    └──────────────────────┘ └─────────────────┘</div>
+
+  <div class="code-box">graph TD
+    Admin[🛡️ Admin] --> Login((Login))
+    Login <--> UserTable[(📁 User Table)]
+    Login --> P1((Manage Students)) <--> D1[(📁 Student Profiles Store)]
+    Login --> P2((Manage Security Staff)) <--> D2[(📁 Staff Accounts Store)]
+    Login --> P3((Audit Scan History)) <--> D3[(📁 Verification Logs Store)]
+    Login --> P4((Export CSV Reports)) <--> D3</div>
+
+  <div class="sub-header">3.3 Level 1 - Security Staff (Verifier)</div>
+  <p>Decomposes gate verifier functionality. Security officers log in, capture/upload candidate ID cards, execute Tesseract OCR scanning, match extracted details against database records, and issue pass/fail decisions.</p>
+
+  <div class="code-box"> ┌──────────────┐
+ ┌──►│  User Table  │
+ │ └──────────────┘
+ ▼
+┌────────┐ ┌─────────┐ ┌──────────────────────┐ ┌─────────────────┐
+│Security│───►│ Staff   │─►│ Upload Candidate Scan│◄──►│ Uploads Store   │
+│ Staff  │ │ Login   │ ├──────────────────────┤ └─────────────────┘
+└────────┘ └─────────┘ │ Run Tesseract OCR    │◄──►│ OCR Engine      │
+                       ├──────────────────────┤ └─────────────────┘
+                       │ Match Candidate Roll │◄──►│ Student Store   │
+                       ├──────────────────────┤ └─────────────────┘
+                       │ Log Verification     │◄──►│ VerificationLogs│
+                       └──────────────────────┘ └─────────────────┘</div>
+
+  <div class="code-box">graph TD
+    Staff[👮 Security Staff] --> SLogin((Staff Login))
+    SLogin <--> UserTable[(📁 User Table)]
+    SLogin --> SP1((Upload ID Photo Scan)) <--> SD1[(📁 Uploads Store)]
+    SLogin --> SP2((Execute OCR Parsing)) <--> SD2[(📁 Tesseract Engine)]
+    SLogin --> SP3((Query Roll Number Match)) <--> SD3[(📁 Student Store)]
+    SLogin --> SP4((Save Gate Decision & Emit Alert)) <--> SD4[(📁 Verification Logs)]</div>
+
+  <div class="sub-header">3.4 Level 1 - Student</div>
+  <p>Decomposes student functionality. Registered candidates authenticate to access digital hall tickets, view assigned exam centers and seating schedules, and verify registration status.</p>
+
+  <div class="code-box"> ┌──────────────┐
+ ┌──►│  User Table  │
+ │ └──────────────┘
+ ▼
+┌────────┐ ┌─────────┐ ┌──────────────────────┐ ┌─────────────────┐
+│Student │───►│ Student │─►│ View Profile Info    │◄──►│ User Profile    │
+│        │ │ Login   │ ├──────────────────────┤ └─────────────────┘
+└────────┘ └─────────┘ │ Digital Hall Ticket  │◄──►│ Exam Schedule   │
+                       ├──────────────────────┤ └─────────────────┘
+                       │ View Exam Venue      │◄──►│ Center Details  │
+                       └──────────────────────┘ └─────────────────┘</div>
+
+  <div class="code-box">graph TD
+    Student[👤 Student] --> StLogin((Student Login))
+    StLogin <--> UserTable[(📁 User Table)]
+    StLogin --> StP1((View Candidate Profile)) <--> StD1[(📁 Users Store)]
+    StLogin --> StP2((Generate Digital Hall Ticket)) <--> StD2[(📁 Exam Schedule Store)]
+    StLogin --> StP3((View Gate Scan History)) <--> StD3[(📁 Verification Logs)]</div>
+
+  <div class="sub-header">3.5 Level 2 - Verification Engine & Admin (Detailed Decomposition)</div>
+  <p>Detailed Level 2 breakdown showing exact sub-processes and datastores managed by the Verification Engine and Administrator.</p>
+
+  <div class="code-box">┌───────┐
+│ Admin │──────┐
+└───────┘ │
+          ├──────► ┌──────────────────────┐
+          │        │ Manage Students      │
+          │        ├──────────────────────┤
+          │        │ ├─ Add Student       │
+          │        │ ├─ Import CSV Batch  │──────► ┌─────────────────┐
+          │        │ ├─ Edit Profile      │        │ Student Profile │
+          │        │ └─ Delete Record     │◄────── │ Collection      │
+          │        └──────────────────────┘        └─────────────────┘
+          │
+          ├──────► ┌──────────────────────┐
+          │        │ Verification Engine  │
+          │        ├──────────────────────┤
+          │        │ ├─ Upload ID Image   │
+          │        │ ├─ OCR Extract Text  │──────► ┌─────────────────┐
+          │        │ ├─ Roll Match Query  │        │ VerificationLog │
+          │        │ └─ Calculate Score   │◄────── │ Collection      │
+          │        └──────────────────────┘        └─────────────────┘
+          │
+          └──────► ┌──────────────────────┐
+                   │ Audit & Export       │
+                   ├──────────────────────┤
+                   │ ├─ Real-Time Stream │──────► ┌─────────────────┐
+                   │ └─ Download CSV      │◄────── │ Security Audit  │
+                   └──────────────────────┘        └─────────────────┘</div>
+
+  <div class="code-box">graph TD
+    Admin[🛡️ Admin] --> Students[Manage Students]
+    Students --> W1((Add Student)) --> D1[(📁 User Store)]
+    Students --> W2((Import CSV Batch)) <--> D1
+    Students --> W3((Edit Profile)) --> D1
+    Students --> W4((Delete Student)) --> D1
+
+    Staff[👮 Verifier] --> Engine[Verification Engine]
+    Engine --> E1((Upload Scan Photo)) --> D2[(📁 Uploads)]
+    Engine --> E2((Run Tesseract OCR)) --> E3((Extract Roll Number))
+    E3 --> E4((Match Against DB)) <--> D1
+    E4 --> E5((Compute Match % & Status)) --> D3[(📁 Verification Logs)]
+    E5 --> E6((Emit Socket.io Event))</div>
+</div>
+
+<!-- SECTION 4: USER STORIES -->
+<div class="page-break">
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="section-header">4. USER STORIES</div>
+  <p>User stories are categorized under four main Epics, complete with Acceptance Criteria and Story Point estimates based on the Fibonacci scale.</p>
+
+  <div class="epic-title">Epic 1: Identity & Access Management (IAM)</div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 1.1: Security Staff & Admin Registration with Email OTP</div>
+    <div class="story-body">
+      <p><strong>As a</strong> Security Officer / Administrator,</p>
+      <p><strong>I want to</strong> register an account using my email and verify via a 6-digit OTP,</p>
+      <p><strong>So that</strong> only authorized gate personnel can log into the verification portal.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Nodemailer dispatches a 6-digit OTP code with 5-minute TTL expiration.</li>
+        <li>Passwords are pre-hashed using Bcrypt (12 salt rounds) prior to storage.</li>
+        <li>Returns HTTP <span class="code-pill">201 Created</span> upon successful OTP validation.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 3 SP</p>
+    </div>
+  </div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 1.2: Unified JWT Authentication & Role Control</div>
+    <div class="story-body">
+      <p><strong>As a</strong> User (Student / Admin / Security Staff),</p>
+      <p><strong>I want to</strong> authenticate using my registered credentials,</p>
+      <p><strong>So that</strong> I can receive a secure JSON Web Token and access role-restricted pages.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Returns JWT token containing user ID and role payload on valid match.</li>
+        <li>Invalid credentials return HTTP <span class="code-pill">401 Unauthorized</span> response.</li>
+        <li>Frontend stores JWT in <span class="code-pill">localStorage</span> and auto-attaches via Axios headers.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 3 SP</p>
+    </div>
+  </div>
+
+  <div class="epic-title">Epic 2: Student Master Data & ID Management (SMD)</div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 2.1: Student Profile Creation & ID Card Photo Upload</div>
+    <div class="story-body">
+      <p><strong>As an</strong> Administrator,</p>
+      <p><strong>I want to</strong> add candidate details and upload their reference ID card photo,</p>
+      <p><strong>So that</strong> candidate records exist for gate matching during examinations.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Multer middleware handles image upload and saves path to student profile.</li>
+        <li>Enforces unique roll number constraint in MongoDB database.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 5 SP</p>
+    </div>
+  </div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 2.2: Bulk Student Registration via CSV Import</div>
+    <div class="story-body">
+      <p><strong>As an</strong> Administrator,</p>
+      <p><strong>I want to</strong> upload a CSV file containing candidate records,</p>
+      <p><strong>So that</strong> I can onboard thousands of exam candidates simultaneously.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Parses CSV rows into structured JSON objects and batch-inserts to MongoDB.</li>
+        <li>Returns clear breakdown of successfully imported versus duplicate records.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 4 SP</p>
+    </div>
+  </div>
+
+  <div class="epic-title">Epic 3: OCR Gate Verification & Identity Matching (OIV)</div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 3.1: Live Camera Scan & Image Capture UI</div>
+    <div class="story-body">
+      <p><strong>As a</strong> Security Staff Verifier,</p>
+      <p><strong>I want to</strong> capture or upload a candidate's ID card photo at the entrance gate,</p>
+      <p><strong>So that</strong> the system can process the image for text recognition.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Webcam integration allows instantaneous frame capture or drag-drop upload.</li>
+        <li>Visual loading overlay displays scan progress to the officer.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 5 SP</p>
+    </div>
+  </div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 3.2: Tesseract OCR Engine Text Extraction & Matching</div>
+    <div class="story-body">
+      <p><strong>As a</strong> Security Staff Verifier,</p>
+      <p><strong>I want</strong> Tesseract OCR to extract roll numbers and candidate names automatically,</p>
+      <p><strong>So that</strong> manual keying errors are eliminated during high-volume entry hours.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Regex normalizes extracted text to isolate candidate roll numbers.</li>
+        <li>Queries MongoDB for matching student profile and computes match score.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 5 SP</p>
+    </div>
+  </div>
+
+  <div class="epic-title">Epic 4: Security Dashboard & Real-Time Analytics (SDA)</div>
+
+  <div class="user-story-card">
+    <div class="user-story-title">📖 User Story 4.1: Real-Time Socket.io Security Scan Feed</div>
+    <div class="story-body">
+      <p><strong>As an</strong> Administrator,</p>
+      <p><strong>I want to</strong> view live gate scan results as they occur across all entry gates,</p>
+      <p><strong>So that</strong> I can immediately spot fraudulent attempts or impersonation alerts.</p>
+      <p><strong>Acceptance Criteria:</strong></p>
+      <ul class="ac-list">
+        <li>Socket.io pushes scan events instantly to the central admin dashboard.</li>
+        <li>Displays green APPROVED and red REJECTED badges in real time.</li>
+      </ul>
+      <p><strong>Story Estimate:</strong> 5 SP</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: GIT COMMIT HISTORY SUMMARY -->
+<div class="page-break">
+  <div class="header-running">
+    <span>EXAMSHIELD</span>
+    <span>SCRUM BOOK: SUBMISSION - 2</span>
+  </div>
+
+  <div class="section-header">5. GIT COMMIT HISTORY SUMMARY (REVIEW CYCLE)</div>
+  <p>To fulfill the CIE 2 evaluation requirement of a minimum of 4 commits during the current review cycle, the commit log summary is recorded below:</p>
+
+  <div class="code-box">commit 618f7f58e61ac703860eaf94d8420c1842996689
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Wed Jul 29 22:01:16 2026 +0530
+
+    fixed
+
+commit 588bab2a73f817ce41e6bbdcdc7126d9fe1f64ad
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Wed Jul 29 19:14:44 2026 +0530
+
+    nodemailer otp,reg setup
+
+commit c1b758c401cfcb53a672a0742c8be3b2292b1b12
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Mon Jul 27 22:21:40 2026 +0530
+
+    add
+
+commit f377175e742e6d5651c7e22af9185e7d322e6849
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Mon Jul 27 21:29:47 2026 +0530
+
+    fixed
+
+commit d66287037bcf86a7500e60e4e6a8739244b5f08b
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Wed Jul 15 16:10:43 2026 +0530
+
+    color changed
+
+commit 71359b1c3d7c8a856a6e48e4f2fffe6d85ca7440
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Tue Jul 14 16:37:55 2026 +0530
+
+    verification log
+
+commit ffa0c6ad3a003357d939dacb3002c2d93a2723ef
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Tue Jul 14 14:47:11 2026 +0530
+
+    multer config
+
+commit cf18405619fb3aafb4abdd49350e5f92ce81045b
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Tue Jul 14 00:04:28 2026 +0530
+
+    auth
+
+commit 606690fe3ee3021baecc81d215cc43448e25d9b1
+Author: Athul3588krishna &lt;athul98517772@gmail.com&gt;
+Date:   Mon Jul 13 23:53:03 2026 +0530
+
+    initialised</div>
+
+  <div class="divider-thin"></div>
+  <p style="font-style: italic; color: #475569; margin-top: 20px;">End of Scrum Book Submission - 2 (CIE 2)</p>
+  <div class="divider-thin"></div>
+
+  <div class="footer-running" style="margin-top: 30px;">
+    <span>Department of Computer Applications</span>
+    <span>MEA Engineering College</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -141,3 +141,30 @@ export const sendOTPAPI = async (payload) => {
   const { data } = await axiosInstance.post("/auth/send-otp", payload);
   return data;
 };
+
+/**
+ * approveAllStudentsAPI
+ * PUT /api/students/approve-all (Admin only)
+ */
+export const approveAllStudentsAPI = async () => {
+  const { data } = await axiosInstance.put("/students/approve-all");
+  return data;
+};
+
+/**
+ * getAutoApproveAPI
+ * GET /api/students/auto-approve (Admin only)
+ */
+export const getAutoApproveAPI = async () => {
+  const { data } = await axiosInstance.get("/students/auto-approve");
+  return data;
+};
+
+/**
+ * setAutoApproveAPI
+ * PUT /api/students/auto-approve (Admin only)
+ */
+export const setAutoApproveAPI = async (autoApprove) => {
+  const { data } = await axiosInstance.put("/students/auto-approve", { autoApprove });
+  return data;
+};

@@ -72,6 +72,12 @@ router.post(
       throw new Error("Name, email, password, roll number, course, DOB, and ID number are required");
     }
 
+    const cleanIdNumber = idNumber ? idNumber.trim().replace(/\D/g, "") : "";
+    if (cleanIdNumber.length !== 12) {
+      res.status(400);
+      throw new Error("Aadhaar number must be exactly 12 numeric digits");
+    }
+
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       res.status(409);
@@ -89,7 +95,7 @@ router.post(
     const studentProfile = {
       rollNumber: rollNumber.toUpperCase(),
       course,
-      semester: Number(semester) || 1,
+      semester: Math.min(Math.max(Number(semester) || 1, 1), 20),
       dob,
       idNumber,
       examSubject: examSubject || "Entrance Examination 2026",
@@ -113,6 +119,68 @@ router.post(
       success: true,
       message: "Student candidate registered successfully",
       user: student.toPublicJSON()
+    });
+  })
+);
+
+// ── PUT /api/students/approve-all ──
+// Single-click bulk approval for all pending students.
+router.put(
+  "/approve-all",
+  protect,
+  authorize("admin"),
+  asyncHandler(async (req, res) => {
+    const students = await User.find({ role: "student", isActive: false });
+    let count = 0;
+    for (const s of students) {
+      s.isActive = true;
+      await s.save({ validateBeforeSave: false });
+      count++;
+    }
+
+    try {
+      const { emitEvent } = require("../utils/socket");
+      emitEvent("student_status_updated", { allApproved: true, isActive: true });
+    } catch (err) {
+      console.error("Socket emit error:", err.message);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `🎉 Successfully approved all ${count} pending student registrations!`,
+      count
+    });
+  })
+);
+
+// ── GET & PUT /api/students/auto-approve ──
+// Auto-approval automation mode settings.
+router.get(
+  "/auto-approve",
+  protect,
+  authorize("admin"),
+  asyncHandler(async (req, res) => {
+    const { getAutoApprove } = require("../utils/systemConfig");
+    res.status(200).json({
+      success: true,
+      autoApprove: getAutoApprove()
+    });
+  })
+);
+
+router.put(
+  "/auto-approve",
+  protect,
+  authorize("admin"),
+  asyncHandler(async (req, res) => {
+    const { autoApprove } = req.body;
+    const { setAutoApprove } = require("../utils/systemConfig");
+    const updated = setAutoApprove(autoApprove);
+
+    res.status(200).json({
+      success: true,
+      message: `Auto-approval automation has been turned ${updated ? "ON" : "OFF"}.`,
+      autoApprove: updated
     });
   })
 );
@@ -173,9 +241,16 @@ router.put(
     // Update subprofile fields
     if (!student.studentProfile) student.studentProfile = {};
     if (course) student.studentProfile.course = course;
-    if (semester) student.studentProfile.semester = Number(semester);
+    if (semester) student.studentProfile.semester = Math.min(Math.max(Number(semester) || 1, 1), 20);
     if (dob) student.studentProfile.dob = dob;
-    if (idNumber) student.studentProfile.idNumber = idNumber;
+    if (idNumber) {
+      const cleanIdNumber = idNumber.trim().replace(/\D/g, "");
+      if (cleanIdNumber.length !== 12) {
+        res.status(400);
+        throw new Error("Aadhaar number must be exactly 12 numeric digits");
+      }
+      student.studentProfile.idNumber = cleanIdNumber;
+    }
     if (examSubject) student.studentProfile.examSubject = examSubject;
     if (examDate) student.studentProfile.examDate = examDate;
     if (examTime) student.studentProfile.examTime = examTime;

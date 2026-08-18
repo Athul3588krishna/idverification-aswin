@@ -27,7 +27,9 @@ import {
   FiClock,
   FiBookOpen,
   FiPhone,
-  FiAlertTriangle
+  FiAlertTriangle,
+  FiUserCheck,
+  FiZap
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth";
@@ -36,7 +38,7 @@ import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
 import axiosInstance from "../api/axiosInstance";
 import AdmitCard from "../components/AdmitCard";
-import { registerUserAPI, deleteUserAPI, getAllUsersAPI } from "../api/authAPI";
+import { registerUserAPI, deleteUserAPI, getAllUsersAPI, approveAllStudentsAPI } from "../api/authAPI";
 import { io } from "socket.io-client";
 
 const Dashboard = () => {
@@ -227,6 +229,19 @@ const Dashboard = () => {
     }
   };
 
+  const handleApproveAll = async () => {
+    if (!window.confirm(`Approve all ${stats.pendingStudents} pending candidate registrations right now in 1 click?`)) return;
+    try {
+      const data = await approveAllStudentsAPI();
+      if (data.success) {
+        toast.success(data.message);
+        await fetchStats();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to approve candidates");
+    }
+  };
+
   // Save admin exam configuration
   const handleExamConfigSubmit = (e) => {
     e.preventDefault();
@@ -299,6 +314,35 @@ const Dashboard = () => {
               {/* OVERVIEW TAB */}
               {adminTab === "overview" && (
                 <div className="row g-4">
+                  {/* Pending Approval Alert Banner (if pending students exist) */}
+                  {stats.pendingStudents > 0 && (
+                    <div className="col-12">
+                      <div className="p-3 rounded border border-warning d-flex flex-wrap align-items-center justify-content-between gap-3 animate-fade-in-up" style={{ background: "rgba(245, 158, 11, 0.12)" }}>
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="p-2 bg-warning rounded text-dark">
+                            <FiAlertTriangle size={24} />
+                          </div>
+                          <div>
+                            <h5 className="mb-0 text-warning fw-bold">
+                              {stats.pendingStudents} Candidate{stats.pendingStudents > 1 ? "s" : ""} Awaiting Admin Approval
+                            </h5>
+                            <small className="text-secondary">
+                              Newly registered students cannot view or download their Admit Cards until approved.
+                            </small>
+                          </div>
+                        </div>
+                        <div className="d-flex flex-wrap gap-2">
+                          <button onClick={handleApproveAll} className="btn btn-success fw-bold btn-sm px-3 py-2">
+                            <FiZap size={16} className="me-1" /> ⚡ Approve All ({stats.pendingStudents})
+                          </button>
+                          <Link to="/students?filter=pending" className="btn btn-outline-warning text-warning fw-bold btn-sm px-3 py-2">
+                            <FiUserCheck size={16} className="me-1" /> Review Roster
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Stat Cards */}
                   <div className="col-12 col-md-6 col-lg-3">
                     <div className="stat-card">
@@ -315,17 +359,21 @@ const Dashboard = () => {
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-3">
-                    <div className="stat-card">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <p className="text-muted text-uppercase mb-1" style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}>Security Agents</p>
-                          <h3 className="stat-number mb-0">{stats.totalStaff}</h3>
-                        </div>
-                        <div className="p-3 bg-primary-glow rounded-circle" style={{ color: "var(--primary-light)" }}>
-                          <FiShield size={24} />
+                    <Link to="/students?filter=pending" className="text-decoration-none">
+                      <div className="stat-card" style={stats.pendingStudents > 0 ? { border: "1px solid var(--accent-amber)" } : {}}>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <div>
+                            <p className="text-muted text-uppercase mb-1" style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}>Pending Approvals</p>
+                            <h3 className="stat-number mb-0" style={{ color: stats.pendingStudents > 0 ? "#f59e0b" : "var(--text-primary)" }}>
+                              {stats.pendingStudents || 0}
+                            </h3>
+                          </div>
+                          <div className="p-3 rounded-circle" style={{ color: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.15)" }}>
+                            <FiClock size={24} />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
 
                   <div className="col-12 col-md-6 col-lg-3">
@@ -368,12 +416,17 @@ const Dashboard = () => {
                         Admin Operations Control
                       </h4>
                       <p className="text-secondary mb-4">
-                        As an administrator, you have complete read, write, and audit access. Monitor active candidates, activate or suspend staff credentials, and view verification logs in real-time.
+                        As an administrator, you have complete read, write, and audit access. Monitor active candidates, approve pending registrations, activate or suspend staff credentials, and view verification logs in real-time.
                       </p>
                       <div className="d-flex flex-wrap gap-3">
                         <Link to="/students" className="btn btn-primary-custom d-flex align-items-center gap-2">
-                          <FiUsers size={16} /> Manage Student Roster
+                          <FiUsers size={16} /> Manage Candidate Roster
                         </Link>
+                        {stats.pendingStudents > 0 && (
+                          <Link to="/students?filter=pending" className="btn btn-warning text-dark fw-bold d-flex align-items-center gap-2">
+                            <FiUserCheck size={16} /> Pending Approvals ({stats.pendingStudents})
+                          </Link>
+                        )}
                         <Link to="/history" className="btn btn-outline-secondary d-flex align-items-center gap-2" style={{
                           borderColor: "var(--border-color)",
                           color: "var(--text-primary)"

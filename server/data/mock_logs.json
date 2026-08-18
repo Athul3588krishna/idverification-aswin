@@ -2,8 +2,7 @@
   {
     "_id": "log_58pkl18bh",
     "student": "user_q5sii4xuq",
-    "scannedRollNumber": "MCA25393",
-    "scannedName": "Aswin Kumar",
+    "scannedRollNumber": "MCA25393" ,  "scannedName": "Aswin Kumar",
     "rawOcrText": "MANUAL OVERRIDE CHECK",
     "matchedDetails": {
       "name": "Aswin Kumar",

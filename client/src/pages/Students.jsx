@@ -14,7 +14,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   FiPlus,
@@ -22,31 +22,84 @@ import {
   FiUserCheck,
   FiUserX,
   FiTrash2,
-  FiInfo
+  FiInfo,
+  FiClock,
+  FiCheckCircle,
+  FiUsers
 } from "react-icons/fi";
 import Navbar from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
-import { getAllUsersAPI, updateUserStatusAPI, deleteUserAPI } from "../api/authAPI";
+import {
+  getAllUsersAPI,
+  updateUserStatusAPI,
+  deleteUserAPI,
+  approveAllStudentsAPI,
+  getAutoApproveAPI,
+  setAutoApproveAPI
+} from "../api/authAPI";
 import { io } from "socket.io-client";
+import { FiZap } from "react-icons/fi";
 
 const Students = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialFilter = queryParams.get("filter") || "all";
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState(initialFilter); // "all", "pending", "active"
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalStudents, setTotalStudents] = useState(0);
+  const [autoApprove, setAutoApproveState] = useState(false);
+  const [togglingAutoApprove, setTogglingAutoApprove] = useState(false);
+
+  const fetchAutoApproveStatus = async () => {
+    try {
+      const data = await getAutoApproveAPI();
+      if (data.success) {
+        setAutoApproveState(data.autoApprove);
+      }
+    } catch (err) {
+      console.error("Failed to load auto-approve setting", err);
+    }
+  };
+
+  const handleToggleAutoApprove = async () => {
+    try {
+      setTogglingAutoApprove(true);
+      const nextVal = !autoApprove;
+      const data = await setAutoApproveAPI(nextVal);
+      if (data.success) {
+        setAutoApproveState(data.autoApprove);
+        toast.success(data.message);
+      }
+    } catch (err) {
+      toast.error("Failed to update auto-approve setting");
+    } finally {
+      setTogglingAutoApprove(false);
+    }
+  };
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const data = await getAllUsersAPI({
+      const params = {
         role: "student",
         search,
         page,
         limit: 10
-      });
+      };
+
+      if (statusFilter === "pending") {
+        params.isActive = "false";
+      } else if (statusFilter === "active") {
+        params.isActive = "true";
+      }
+
+      const data = await getAllUsersAPI(params);
       if (data.success) {
         setStudents(data.users || []);
         setTotalPages(data.pages || 1);
@@ -60,14 +113,17 @@ const Students = () => {
   };
 
   useEffect(() => {
-    // Debounce search input to avoid hitting database on every keystroke
+    fetchAutoApproveStatus();
+  }, []);
+
+  useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setPage(1);
       fetchStudents();
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+  }, [search, statusFilter]);
 
   useEffect(() => {
     fetchStudents();
@@ -85,12 +141,15 @@ const Students = () => {
     });
 
     socket.on("student_status_updated", (data) => {
-      // Find and update status in state in real-time
-      setStudents((prev) =>
-        prev.map((student) =>
-          student._id === data.userId ? { ...student, isActive: data.isActive } : student
-        )
-      );
+      if (data.allApproved) {
+        fetchStudents();
+      } else {
+        setStudents((prev) =>
+          prev.map((student) =>
+            student._id === data.userId ? { ...student, isActive: data.isActive } : student
+          )
+        );
+      }
     });
 
     return () => {
@@ -115,6 +174,22 @@ const Students = () => {
     }
   };
 
+  const handleApproveAllPending = async () => {
+    if (!window.confirm("Approve ALL pending student registrations right now in 1 click?")) {
+      return;
+    }
+
+    try {
+      const data = await approveAllStudentsAPI();
+      if (data.success) {
+        toast.success(data.message);
+        fetchStudents();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to approve all candidates.");
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to permanently delete this student account?")) {
       return;
@@ -124,7 +199,6 @@ const Students = () => {
       const data = await deleteUserAPI(id);
       if (data.success) {
         toast.success(data.message);
-        // Refresh list or remove item locally
         setStudents((prev) => prev.filter((student) => student._id !== id));
         setTotalStudents((prev) => prev - 1);
       }
@@ -143,17 +217,42 @@ const Students = () => {
           <div className="row mb-4 align-items-center">
             <div className="col">
               <h2 className="mb-1" style={{ fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>
-                Candidate Roster
+                Candidate Roster & Approvals
               </h2>
-              <p className="text-secondary mb-0">Total: {totalStudents} registered students</p>
+              <p className="text-secondary mb-0">Total: {totalStudents} candidates listed</p>
             </div>
-            <div className="col-auto">
+            <div className="col-auto d-flex flex-wrap align-items-center gap-3">
+              {/* Auto-Approve Toggle */}
+              <div className="form-check form-switch d-flex align-items-center gap-2 p-2 rounded glass-card m-0" style={{ border: "1px solid var(--border-color)" }}>
+                <input
+                  className="form-check-input ms-0 cursor-pointer"
+                  type="checkbox"
+                  id="autoApproveSwitch"
+                  checked={autoApprove}
+                  onChange={handleToggleAutoApprove}
+                  disabled={togglingAutoApprove}
+                  style={{ width: "2.5em", height: "1.25em" }}
+                />
+                <label className="form-check-label text-light small fw-semibold cursor-pointer user-select-none mb-0" htmlFor="autoApproveSwitch">
+                  <FiZap className={autoApprove ? "text-warning me-1" : "text-muted me-1"} size={16} />
+                  Auto-Approve New Students: <strong className={autoApprove ? "text-success" : "text-secondary"}>{autoApprove ? "ON" : "OFF"}</strong>
+                </label>
+              </div>
+
+              {/* Single Click Approve All Button */}
+              <button
+                className="btn btn-success d-flex align-items-center gap-2 fw-bold px-3 py-2"
+                onClick={handleApproveAllPending}
+                title="Approve all pending candidates at once"
+              >
+                <FiZap size={18} /> ⚡ Approve All Candidates (1-Click)
+              </button>
             </div>
           </div>
 
-          {/* Search Controls */}
-          <div className="glass-card mb-4 p-3">
-            <div className="input-group" style={{ maxWidth: "450px" }}>
+          {/* Search Controls & Filter Tabs */}
+          <div className="glass-card mb-4 p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div className="input-group" style={{ maxWidth: "400px" }}>
               <span className="input-group-text border-0" style={{ background: "rgba(255,255,255,0.04)", color: "var(--text-muted)" }}>
                 <FiSearch size={18} />
               </span>
@@ -165,6 +264,29 @@ const Students = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+
+            {/* Status Filter Buttons */}
+            <div className="d-flex gap-2">
+              <button
+                className={`btn btn-sm ${statusFilter === "all" ? "btn-primary-custom" : "btn-outline-secondary"}`}
+                style={statusFilter !== "all" ? { borderColor: "var(--border-color)", color: "var(--text-secondary)" } : {}}
+                onClick={() => { setStatusFilter("all"); setPage(1); }}
+              >
+                <FiUsers className="me-1" size={14} /> All Candidates
+              </button>
+              <button
+                className={`btn btn-sm ${statusFilter === "pending" ? "btn-warning text-dark fw-bold" : "btn-outline-warning"}`}
+                onClick={() => { setStatusFilter("pending"); setPage(1); }}
+              >
+                <FiClock className="me-1" size={14} /> Pending Approval
+              </button>
+              <button
+                className={`btn btn-sm ${statusFilter === "active" ? "btn-success" : "btn-outline-success"}`}
+                onClick={() => { setStatusFilter("active"); setPage(1); }}
+              >
+                <FiCheckCircle className="me-1" size={14} /> Approved / Active
+              </button>
+            </div>
           </div>
 
           {/* List/Table Card */}
@@ -174,11 +296,15 @@ const Students = () => {
             ) : students.length === 0 ? (
               <div className="text-center py-5 text-secondary">
                 <FiInfo size={32} className="mb-2" />
-                <p className="mb-0">No registered students found.</p>
+                <p className="mb-0">
+                  {statusFilter === "pending"
+                    ? "No pending student approvals at this time. All caught up!"
+                    : "No registered students found matching criteria."}
+                </p>
               </div>
             ) : (
               <div className="table-responsive">
-                <table className="table table-custom m-0">
+                <table className="table table-custom m-0 align-middle">
                   <thead>
                     <tr>
                       <th>Candidate Name</th>
@@ -186,7 +312,7 @@ const Students = () => {
                       <th>Course</th>
                       <th>Sem</th>
                       <th>Exam Center Venue</th>
-                      <th>Entry Status</th>
+                      <th>Approval Status</th>
                       <th className="text-end">Actions</th>
                     </tr>
                   </thead>
@@ -207,20 +333,30 @@ const Students = () => {
                         <td className="text-wrap" style={{ maxWidth: "200px" }}>{student.studentProfile?.examCenter || "N/A"}</td>
                         <td>
                           <span className={student.isActive ? "badge-success" : "badge-warning"}>
-                            {student.isActive ? "ACTIVE / ELIGIBLE" : "PENDING APPROVAL"}
+                            {student.isActive ? "APPROVED / ACTIVE" : "PENDING APPROVAL"}
                           </span>
                         </td>
                         <td className="text-end">
                           <div className="d-inline-flex gap-2">
-                            {/* Toggle Access Status */}
-                            <button
-                              onClick={() => handleToggleStatus(student._id, student.isActive)}
-                              className={`btn btn-sm ${student.isActive ? "btn-outline-warning" : "btn-outline-success"}`}
-                              style={{ padding: "0.3rem 0.5rem" }}
-                              title={student.isActive ? "Block Student" : "Approve Student"}
-                            >
-                              {student.isActive ? <FiUserX size={16} /> : <FiUserCheck size={16} />}
-                            </button>
+                            {/* Prominent Approve Button for Pending Candidates */}
+                            {!student.isActive ? (
+                              <button
+                                onClick={() => handleToggleStatus(student._id, student.isActive)}
+                                className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-bold"
+                                title="Approve Student Account"
+                              >
+                                <FiUserCheck size={16} /> Approve Candidate
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleToggleStatus(student._id, student.isActive)}
+                                className="btn btn-sm btn-outline-warning"
+                                style={{ padding: "0.3rem 0.5rem" }}
+                                title="Revoke Approval / Block"
+                              >
+                                <FiUserX size={16} />
+                              </button>
+                            )}
 
                             {/* Delete Button */}
                             <button

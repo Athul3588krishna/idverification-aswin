@@ -59,7 +59,14 @@ const Register = () => {
   }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    if (name === "idNumber") {
+      // Only allow digits and limit to max 12 characters for Aadhaar
+      const cleanValue = value.replace(/\D/g, "").slice(0, 12);
+      setFormData((prev) => ({ ...prev, [name]: cleanValue }));
+      return;
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -70,6 +77,13 @@ const Register = () => {
     // Validate form inputs (excluding OTP)
     if (!name.trim() || !email.trim() || !password.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !selectedFile) {
       toast.warn("Please fill in all required fields (marked with *), including your Photo Upload");
+      return;
+    }
+
+    // Aadhaar number 12-digit validation
+    const cleanIdNumber = idNumber.trim().replace(/\D/g, "");
+    if (cleanIdNumber.length !== 12) {
+      toast.warn("Aadhaar number must be exactly 12 digits");
       return;
     }
 
@@ -279,20 +293,33 @@ const Register = () => {
                   </div>
 
                   <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Government ID Number *</label>
+                    <label className="form-label-custom">Aadhaar Number (12 Digits) *</label>
                     <div className="input-wrapper">
                       <span className="input-icon"><FiCreditCard size={16} /></span>
                       <input
                         type="text"
                         name="idNumber"
                         className="form-control-custom with-icon"
-                        placeholder="Aadhaar or Govt ID Card No"
+                        placeholder="12-digit Aadhaar Number"
                         value={formData.idNumber}
                         onChange={handleChange}
+                        maxLength={12}
+                        inputMode="numeric"
+                        pattern="\d{12}"
                         disabled={isLoading}
                         required
                       />
                     </div>
+                    {formData.idNumber && formData.idNumber.length > 0 && formData.idNumber.length < 12 && (
+                      <small className="text-warning mt-1 d-block">
+                        Aadhaar number must be exactly 12 digits ({formData.idNumber.length}/12)
+                      </small>
+                    )}
+                    {formData.idNumber && formData.idNumber.length === 12 && (
+                      <small className="text-success mt-1 d-block">
+                        ✓ Valid 12-digit Aadhaar format
+                      </small>
+                    )}
                   </div>
                 </div>
 
@@ -341,7 +368,7 @@ const Register = () => {
                       name="semester"
                       className="form-control-custom"
                       min="1"
-                      max="8"
+                      max="20"
                       value={formData.semester}
                       onChange={handleChange}
                       disabled={isLoading}

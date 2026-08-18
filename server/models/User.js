@@ -47,7 +47,7 @@ const studentProfileSchema = new mongoose.Schema(
     semester: {
       type: Number,
       min: 1,
-      max: 10,
+      max: 20,
     },
     examCenter: {
       type: String,
@@ -66,7 +66,14 @@ const studentProfileSchema = new mongoose.Schema(
     },
     idNumber: {
       type: String,
-      trim: true, // e.g., Aadhaar number or Govt ID
+      trim: true, // 12-digit Aadhaar number
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          return /^\d{12}$/.test(v.replace(/\s+/g, ""));
+        },
+        message: (props) => `${props.value} is not a valid 12-digit Aadhaar number`
+      }
     },
     examSubject: {
       type: String,
