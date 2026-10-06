@@ -47,6 +47,7 @@ const {
   getUserById,
   updateUserStatus,
   deleteUser,
+  uploadStudentPhoto,
 } = require("../controllers/authController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -87,6 +88,11 @@ router
   .route("/me")
   .get(protect, getMe)
   .put(protect, updateProfile);
+
+/**
+ * PUT /api/auth/me/photo → Upload/update student candidate photo
+ */
+router.put("/me/photo", protect, upload.single("photo"), uploadStudentPhoto);
 
 /**
  * PUT /api/auth/password → Change own password

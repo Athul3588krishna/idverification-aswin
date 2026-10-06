@@ -70,17 +70,54 @@ const verificationLogSchema = new mongoose.Schema(
       }
     },
 
+    // ── Verification method ──
+    verificationType: {
+      type: String,
+      enum: ["OCR_ID_CARD", "QR_HALL_TICKET", "MANUAL_OVERRIDE"],
+      default: "OCR_ID_CARD"
+    },
+
+    // ── Anti-passback tracking ──
+    isDuplicateEntry: {
+      type: Boolean,
+      default: false
+    },
+
+    // ── Allocated Exam Room / Seat for this record ──
+    allocatedHall: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    allocatedSeat: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+
     // ── Reason for denial (if rejected) ──
     rejectionReason: {
       type: String,
       trim: true,
-      default: "" // e.g. "Candidate roll number not registered", "Photo mismatch", "Suspended permit"
+      default: "" // e.g. "Candidate roll number not registered", "Duplicate entry detected", "Suspended permit"
     },
 
-    // ── File details ──
+    // ── Incident escalation state ──
+    incidentStatus: {
+      type: String,
+      enum: ["CLEARED", "SUSPECT_IMPERSONATION", "DAMAGED_ID", "UNDER_REVIEW"],
+      default: "CLEARED"
+    },
+
+    // ── Evidence files ──
     idCardPhotoPath: {
       type: String,
-      required: [true, "ID card upload photo path is required"]
+      default: ""
+    },
+
+    liveCandidatePhotoPath: {
+      type: String,
+      default: null
     },
 
     // ── Security Staff / Admin who conducted this scan ──

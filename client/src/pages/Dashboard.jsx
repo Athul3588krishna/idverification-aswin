@@ -7,7 +7,7 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   FiUsers,
@@ -29,7 +29,8 @@ import {
   FiPhone,
   FiAlertTriangle,
   FiUserCheck,
-  FiZap
+  FiZap,
+  FiCamera
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth";
@@ -38,11 +39,13 @@ import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
 import axiosInstance from "../api/axiosInstance";
 import AdmitCard from "../components/AdmitCard";
-import { registerUserAPI, deleteUserAPI, getAllUsersAPI, approveAllStudentsAPI } from "../api/authAPI";
+import { registerUserAPI, deleteUserAPI, getAllUsersAPI, approveAllStudentsAPI, uploadStudentPhotoAPI } from "../api/authAPI";
 import { io } from "socket.io-client";
 
+const serverBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api").replace(/\/api$/, "");
+
 const Dashboard = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, refreshUser } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -66,6 +69,53 @@ const Dashboard = () => {
   const [verificationStatus, setVerificationStatus] = useState("PENDING"); // PENDING, APPROVED, REJECTED
   const [verificationReason, setVerificationReason] = useState("");
   const [recentStudentLog, setRecentStudentLog] = useState(null);
+  const photoInputRef = useRef(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.warn("Please select a valid image file (JPEG, PNG, etc.)");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warn("Image file size should be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    setUploadingPhoto(true);
+    try {
+      const data = await uploadStudentPhotoAPI(formData);
+      if (data.success) {
+        toast.success("Candidate photo uploaded successfully! 🎉");
+        if (data.user) {
+          updateUser(data.user);
+        } else if (data.photoUrl) {
+          updateUser({
+            ...user,
+            studentProfile: {
+              ...(user.studentProfile || {}),
+              idCardImageUrl: data.photoUrl,
+            },
+          });
+        }
+        if (typeof refreshUser === "function") {
+          refreshUser();
+        }
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -160,12 +210,25 @@ const Dashboard = () => {
 
     if (user.role === "admin" || user.role === "security_staff") {
       socket.on("verification_logged", (data) => {
-        // Refresh dashboard metrics
         fetchStats();
         if (user.role === "admin") {
           fetchSecurityStaff();
         }
-        toast.info(`🔔 Real-time scan: Candidate ${data.rollNumber} checked in.`);
+      });
+
+      socket.on("candidate_checked_in", (data) => {
+        fetchStats();
+        toast.success(`🎟️ Candidate ${data.rollNumber} (${data.name}) checked in → ${data.hall || 'Exam Hall'} [${data.seat || 'Desk'}]`);
+      });
+
+      socket.on("duplicate_entry_detected", (data) => {
+        fetchStats();
+        toast.error(`🚨 SECURITY ALERT: Duplicate Entry Attempt by ${data.rollNumber} (${data.studentName || 'Candidate'})!`);
+      });
+
+      socket.on("session_reset", () => {
+        fetchStats();
+        toast.info("🔄 Gate verification session was reset by administrator.");
       });
 
       socket.on("student_status_updated", (data) => {
@@ -175,9 +238,13 @@ const Dashboard = () => {
 
     if (user.role === "student") {
       socket.on("student_status_updated", (data) => {
-        if (data.userId === user._id) {
-          toast.success(`🎉 Admin has approved your candidate profile!`);
-          updateUser({ isActive: data.isActive });
+        if (data.allApproved || data.userId === user._id) {
+          toast.success(`🎉 Admin has updated your candidate approval status!`);
+          if (typeof refreshUser === "function") {
+            refreshUser();
+          } else {
+            updateUser({ isActive: data.isActive !== undefined ? data.isActive : true });
+          }
         }
       });
     }
@@ -185,15 +252,29 @@ const Dashboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, [user, updateUser]);
+  }, [user, updateUser, refreshUser]);
 
   // Handle adding new security agent
   const handleAddStaffSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password } = newStaff;
+    const { name, email, password, phone } = newStaff;
     if (!name || !email || !password) {
       toast.warn("Name, email, and password are required");
       return;
+    }
+
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(name.trim())) {
+      toast.warn("Staff Name must contain only alphabets and spaces");
+      return;
+    }
+
+    if (phone && phone.trim()) {
+      const cleanPhone = phone.trim().replace(/\D/g, "");
+      if (cleanPhone.length !== 10) {
+        toast.warn("Phone number must be exactly 10 digits");
+        return;
+      }
     }
 
     setIsAddingStaff(true);
@@ -239,6 +320,20 @@ const Dashboard = () => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to approve candidates");
+    }
+  };
+
+  // Reset exam check-in session (Viva Demo & New Exam Shift reset)
+  const handleResetSession = async () => {
+    if (!window.confirm("Are you sure you want to reset all candidate check-in statuses? All students will be marked as 'NOT_ARRIVED' for the new exam session.")) return;
+    try {
+      const res = await axiosInstance.post("/verify/reset-session");
+      if (res.data?.success) {
+        toast.success(res.data.message || "Session reset successfully! 🎉");
+        await fetchStats();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to reset session");
     }
   };
 
@@ -408,6 +503,61 @@ const Dashboard = () => {
                     </div>
                   </div>
 
+                  {/* Live Exam Gate Attendance & Anti-Passback Control Box */}
+                  <div className="col-12">
+                    <div className="glass-card p-4 animate-fade-in-up" style={{ border: "1px solid rgba(99, 102, 241, 0.3)" }}>
+                      <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 border-bottom border-secondary pb-3">
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="p-2 bg-primary rounded text-light">
+                            <FiShield size={22} />
+                          </div>
+                          <div>
+                            <h5 className="mb-0 fw-bold">Live Examination Gate Attendance & Security Feed</h5>
+                            <small className="text-secondary">Real-time gate check-in status, seating capacity, and anti-passback breach monitoring</small>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleResetSession}
+                          className="btn btn-sm btn-outline-danger d-flex align-items-center gap-2 px-3 py-2"
+                          title="Reset all student check-in states to NOT_ARRIVED for live demo or next shift"
+                        >
+                          <FiRefreshCw size={14} /> Reset Gate Session (New Shift / Demo)
+                        </button>
+                      </div>
+
+                      <div className="row g-3 text-center">
+                        <div className="col-6 col-md-3">
+                          <div className="p-3 rounded bg-dark border border-secondary">
+                            <small className="text-muted d-block text-uppercase fw-bold" style={{ fontSize: "0.68rem" }}>Registered Roster</small>
+                            <h3 className="fw-bold text-light mb-0">{stats.totalStudents || 0}</h3>
+                            <small className="text-muted" style={{ fontSize: "0.65rem" }}>Total Candidates</small>
+                          </div>
+                        </div>
+                        <div className="col-6 col-md-3">
+                          <div className="p-3 rounded bg-dark border border-success">
+                            <small className="text-muted d-block text-uppercase fw-bold" style={{ fontSize: "0.68rem" }}>Admitted to Hall</small>
+                            <h3 className="fw-bold text-success mb-0">{stats.checkedInStudents !== undefined ? stats.checkedInStudents : (stats.successScans || 0)}</h3>
+                            <small className="text-success" style={{ fontSize: "0.65rem" }}>Checked In at Gate</small>
+                          </div>
+                        </div>
+                        <div className="col-6 col-md-3">
+                          <div className="p-3 rounded bg-dark border border-warning">
+                            <small className="text-muted d-block text-uppercase fw-bold" style={{ fontSize: "0.68rem" }}>Not Yet Arrived</small>
+                            <h3 className="fw-bold text-warning mb-0">{stats.notArrivedStudents !== undefined ? stats.notArrivedStudents : Math.max(0, (stats.totalStudents || 0) - (stats.checkedInStudents || 0))}</h3>
+                            <small className="text-warning" style={{ fontSize: "0.65rem" }}>Outside Gate</small>
+                          </div>
+                        </div>
+                        <div className="col-6 col-md-3">
+                          <div className="p-3 rounded bg-dark border border-danger">
+                            <small className="text-muted d-block text-uppercase fw-bold" style={{ fontSize: "0.68rem" }}>Duplicate Breach Blocks</small>
+                            <h3 className="fw-bold text-danger mb-0">{stats.duplicateBreaches || 0}</h3>
+                            <small className="text-danger" style={{ fontSize: "0.65rem" }}>Pass-back Prevented</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Operations Control Banner */}
                   <div className="col-12 col-lg-8">
                     <div className="glass-card h-100">
@@ -514,7 +664,10 @@ const Dashboard = () => {
                               className="form-control-custom with-icon"
                               placeholder="e.g. Officer John"
                               value={newStaff.name}
-                              onChange={(e) => setNewStaff(p => ({ ...p, name: e.target.value }))}
+                              onChange={(e) => {
+                                const cleanVal = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                                setNewStaff(p => ({ ...p, name: cleanVal }));
+                              }}
                               required
                             />
                           </div>
@@ -562,7 +715,11 @@ const Dashboard = () => {
                               className="form-control-custom with-icon"
                               placeholder="10 digit number"
                               value={newStaff.phone}
-                              onChange={(e) => setNewStaff(p => ({ ...p, phone: e.target.value }))}
+                              maxLength={10}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, "");
+                                setNewStaff(p => ({ ...p, phone: val }));
+                              }}
                             />
                           </div>
                         </div>
@@ -738,7 +895,65 @@ const Dashboard = () => {
               {/* Profile Card & Details */}
               <div className="col-12 col-lg-7">
                 <div className="glass-card">
-                  <h4 className="mb-4 border-bottom border-secondary pb-2">Candidate Hall Ticket Profile</h4>
+                  <div className="d-flex align-items-center justify-content-between mb-4 border-bottom border-secondary pb-3">
+                    <h4 className="mb-0">Candidate Hall Ticket Profile</h4>
+                    <div className="d-flex align-items-center gap-2">
+                      <input
+                        type="file"
+                        ref={photoInputRef}
+                        onChange={handlePhotoUpload}
+                        accept="image/*"
+                        className="d-none"
+                      />
+                      <div
+                        className="rounded-2 overflow-hidden border border-secondary shadow-sm position-relative d-flex align-items-center justify-content-center"
+                        style={{
+                          width: "56px",
+                          height: "68px",
+                          background: "rgba(255,255,255,0.05)",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => photoInputRef.current?.click()}
+                        title="Click to change candidate photo"
+                      >
+                        {(user.studentProfile?.idCardImageUrl || user.idCardImageUrl) ? (
+                          <img
+                            src={
+                              (user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith("http") ||
+                              (user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith("data:")
+                                ? (user.studentProfile?.idCardImageUrl || user.idCardImageUrl)
+                                : `${serverBaseUrl}${(user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith('/') ? '' : '/'}${user.studentProfile?.idCardImageUrl || user.idCardImageUrl}`
+                            }
+                            alt="Student Photo"
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                        ) : (
+                          <div className="text-center text-muted p-1">
+                            <FiCamera size={20} className="text-primary mb-1" />
+                            <small className="d-block" style={{ fontSize: "0.55rem" }}>Add</small>
+                          </div>
+                        )}
+                        {uploadingPhoto && (
+                          <div
+                            className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                            style={{ background: "rgba(0,0,0,0.6)" }}
+                          >
+                            <span className="spinner-border spinner-border-sm text-light"></span>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1 px-2"
+                        onClick={() => photoInputRef.current?.click()}
+                        disabled={uploadingPhoto}
+                        style={{ fontSize: "0.75rem", borderColor: "rgba(255,255,255,0.15)", color: "var(--text-secondary)" }}
+                      >
+                        <FiCamera size={13} />
+                        {(user.studentProfile?.idCardImageUrl || user.idCardImageUrl) ? "Change Photo" : "Upload Photo"}
+                      </button>
+                    </div>
+                  </div>
                   
                   <div className="row g-3">
                     <div className="col-md-6">
@@ -749,6 +964,11 @@ const Dashboard = () => {
                     <div className="col-md-6">
                       <small className="text-muted d-block text-uppercase" style={{ fontSize: "0.7rem" }}>Roll / Reg Number</small>
                       <span className="fw-semibold text-primary fs-5">{user.studentProfile?.rollNumber || "N/A"}</span>
+                    </div>
+
+                    <div className="col-md-6">
+                      <small className="text-muted d-block text-uppercase" style={{ fontSize: "0.7rem" }}>Phone Number</small>
+                      <span className="fw-semibold text-light">{user.phone || "N/A"}</span>
                     </div>
 
                     <div className="col-md-6">

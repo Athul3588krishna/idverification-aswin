@@ -94,6 +94,38 @@ const studentProfileSchema = new mongoose.Schema(
       type: String,
       default: null, // Path to uploaded reference ID card image
     },
+    allocatedHall: {
+      type: String,
+      trim: true,
+      default: "Main Block - Room 204",
+    },
+    allocatedSeat: {
+      type: String,
+      trim: true,
+      default: "Desk #18",
+    },
+    checkInStatus: {
+      type: String,
+      enum: {
+        values: ["NOT_ARRIVED", "CHECKED_IN", "FLAGGED", "COMPLETED"],
+        message: "Status must be NOT_ARRIVED, CHECKED_IN, FLAGGED, or COMPLETED",
+      },
+      default: "NOT_ARRIVED",
+    },
+    checkInTime: {
+      type: Date,
+      default: null,
+    },
+    qrToken: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    incidentNote: {
+      type: String,
+      trim: true,
+      default: "",
+    },
   },
   { _id: false } // No separate _id for the sub-document
 );
@@ -110,6 +142,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: [2, "Name must be at least 2 characters"],
       maxlength: [80, "Name cannot exceed 80 characters"],
+      match: [/^[a-zA-Z\s]+$/, "Name must contain only alphabets and spaces"],
     },
 
     email: {
@@ -182,6 +215,16 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// ═══════════════════════════════════════════════════════════════
+// PRE-VALIDATE HOOK: Clean phone number
+// ═══════════════════════════════════════════════════════════════
+userSchema.pre("validate", function (next) {
+  if (this.phone === "" || (typeof this.phone === "string" && !this.phone.trim())) {
+    this.phone = null;
+  }
+  if (next) next();
+});
 
 // ═══════════════════════════════════════════════════════════════
 // PRE-SAVE HOOK: Hash password before saving to database

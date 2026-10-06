@@ -241,14 +241,26 @@ const VerificationHistory = () => {
                           <span className={log.status === "APPROVED" ? "badge-success" : "badge-danger"}>
                             {log.status}
                           </span>
+                          {log.isDuplicateEntry && (
+                            <span className="badge bg-danger ms-1" style={{ fontSize: "0.65rem" }}>
+                              🚨 DUPLICATE
+                            </span>
+                          )}
+                          {log.verificationType === "QR_HALL_TICKET" && (
+                            <span className="badge bg-info text-dark ms-1" style={{ fontSize: "0.65rem" }}>
+                              ⚡ QR
+                            </span>
+                          )}
                         </td>
-                        <td className="text-wrap" style={{ maxWidth: "200px" }}>
+                        <td className="text-wrap" style={{ maxWidth: "220px" }}>
                           {log.status === "REJECTED" ? (
                             <span className="text-warning small d-inline-flex align-items-center gap-1">
                               {log.rejectionReason}
                             </span>
                           ) : (
-                            <span className="text-muted small">—</span>
+                            <span className="text-success small fw-semibold">
+                              ✓ {log.allocatedHall ? `${log.allocatedHall} [${log.allocatedSeat}]` : "Admitted"}
+                            </span>
                           )}
                         </td>
                         <td>

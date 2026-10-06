@@ -126,11 +126,27 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Name, email, password, and role are required");
   }
 
+  // ── Validate name (alphabets and spaces only) ──
+  const nameRegex = /^[a-zA-Z\s]+$/;
+  if (!nameRegex.test(name.trim())) {
+    res.status(400);
+    throw new Error("Name must contain only alphabets and spaces");
+  }
+
   // ── Validate role value ──
   const validRoles = ["admin", "security_staff", "student"];
   if (!validRoles.includes(role)) {
     res.status(400);
     throw new Error(`Invalid role. Must be one of: ${validRoles.join(", ")}`);
+  }
+
+  // ── Validate optional phone number format (10 digits) ──
+  if (phone && phone.trim()) {
+    const cleanPhone = phone.trim().replace(/\D/g, "");
+    if (cleanPhone.length !== 10) {
+      res.status(400);
+      throw new Error("Phone number must be exactly 10 numeric digits");
+    }
   }
 
   // ── Check for duplicate email ──
@@ -146,6 +162,11 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!rollNumber || !course) {
       res.status(400);
       throw new Error("Roll number and course are required for student accounts");
+    }
+
+    if (!phone || !phone.trim()) {
+      res.status(400);
+      throw new Error("Phone number is required for student accounts");
     }
 
     if (idNumber) {
@@ -194,6 +215,20 @@ const registerUser = asyncHandler(async (req, res) => {
     isActive: true,
   });
 
+  if (role === "student") {
+    try {
+      const { emitEvent } = require("../utils/socket");
+      emitEvent("student_status_updated", {
+        newStudent: true,
+        userId: user._id,
+        isActive: user.isActive,
+        email: user.email
+      });
+    } catch (err) {
+      console.error("Socket emit error:", err.message);
+    }
+  }
+
   res.status(201).json({
     success: true,
     message: `${role.replace("_", " ")} account created successfully`,
@@ -236,8 +271,26 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 
   // Only update provided fields
-  if (name) user.name = name;
-  if (phone !== undefined) user.phone = phone;
+  if (name) {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(name.trim())) {
+      res.status(400);
+      throw new Error("Name must contain only alphabets and spaces");
+    }
+    user.name = name.trim();
+  }
+  if (phone !== undefined) {
+    if (phone && phone.trim()) {
+      const cleanPhone = phone.trim().replace(/\D/g, "");
+      if (cleanPhone.length !== 10) {
+        res.status(400);
+        throw new Error("Phone number must be exactly 10 numeric digits");
+      }
+      user.phone = cleanPhone;
+    } else {
+      user.phone = null;
+    }
+  }
 
   const updatedUser = await user.save();
 
@@ -469,6 +522,13 @@ const studentRegister = asyncHandler(async (req, res) => {
     throw new Error("Name, email, and password are required");
   }
 
+  // Validate name (alphabets and spaces only)
+  const nameRegex = /^[a-zA-Z\s]+$/;
+  if (!nameRegex.test(name.trim())) {
+    res.status(400);
+    throw new Error("Full Name must contain only alphabets and spaces");
+  }
+
   // Check for duplicate email
   const existingUser = await User.findOne({ email: email.toLowerCase() });
   if (existingUser) {
@@ -476,9 +536,16 @@ const studentRegister = asyncHandler(async (req, res) => {
     throw new Error("An account with this email already exists");
   }
 
-  if (!rollNumber || !course || !dob || !idNumber || !otp) {
+  if (!phone || !phone.trim() || !rollNumber || !course || !dob || !idNumber || !otp) {
     res.status(400);
-    throw new Error("Name, email, password, roll number, course, DOB, ID number, and OTP are required for student registration");
+    throw new Error("Name, email, password, phone number, roll number, course, DOB, ID number, and OTP are required for student registration");
+  }
+
+  // Validate required phone number format (10 digits)
+  const cleanPhone = phone.trim().replace(/\D/g, "");
+  if (cleanPhone.length !== 10) {
+    res.status(400);
+    throw new Error("Phone number must be exactly 10 numeric digits");
   }
 
   // Validate 12-digit Aadhaar number format
@@ -514,6 +581,11 @@ const studentRegister = asyncHandler(async (req, res) => {
     examDate: examDate || "2026-08-15",
     examTime: examTime || "10:00 AM - 1:00 PM",
     examCenter: examCenter || "Hall A - Room 101",
+    allocatedHall: req.body.allocatedHall || "Block B - Room 204",
+    allocatedSeat: req.body.allocatedSeat || `Desk #${Math.floor(Math.random() * 30) + 1}`,
+    checkInStatus: "NOT_ARRIVED",
+    checkInTime: null,
+    qrToken: `EXAM-${rollNumber.toUpperCase()}-2026`,
     idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
   };
 
@@ -524,11 +596,23 @@ const studentRegister = asyncHandler(async (req, res) => {
     name,
     email,
     password,
-    phone: phone || null,
+    phone: cleanPhone,
     role: targetRole,
     studentProfile,
     isActive: isAutoApproved,
   });
+
+  try {
+    const { emitEvent } = require("../utils/socket");
+    emitEvent("student_status_updated", {
+      newStudent: true,
+      userId: user._id,
+      isActive: user.isActive,
+      email: user.email
+    });
+  } catch (err) {
+    console.error("Socket emit error:", err.message);
+  }
 
   res.status(201).json({
     success: true,
@@ -577,6 +661,38 @@ const sendOTP = asyncHandler(async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════
+// @desc    Upload or update candidate student photo
+// @route   PUT /api/auth/me/photo
+// @access  Private — authenticated student
+// ═══════════════════════════════════════════════════════════════
+const uploadStudentPhoto = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("Please select an image file to upload");
+  }
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const photoUrl = `/uploads/${req.file.filename}`;
+  if (!user.studentProfile) {
+    user.studentProfile = {};
+  }
+  user.studentProfile.idCardImageUrl = photoUrl;
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: "Candidate photo updated successfully",
+    photoUrl,
+    user: user.toPublicJSON(),
+  });
+});
+
 // ── Export all controller functions ──
 module.exports = {
   loginUser,
@@ -590,4 +706,5 @@ module.exports = {
   getUserById,
   updateUserStatus,
   deleteUser,
+  uploadStudentPhoto,
 };

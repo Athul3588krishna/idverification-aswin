@@ -60,6 +60,12 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "name") {
+      // Allow only alphabets and spaces (strip digits and special characters)
+      const cleanValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setFormData((prev) => ({ ...prev, [name]: cleanValue }));
+      return;
+    }
     if (name === "idNumber") {
       // Only allow digits and limit to max 12 characters for Aadhaar
       const cleanValue = value.replace(/\D/g, "").slice(0, 12);
@@ -72,11 +78,25 @@ const Register = () => {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
-    const { name, email, password, rollNumber, course, dob, idNumber } = formData;
+    const { name, email, password, phone, rollNumber, course, dob, idNumber } = formData;
 
     // Validate form inputs (excluding OTP)
-    if (!name.trim() || !email.trim() || !password.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !selectedFile) {
+    if (!name.trim() || !email.trim() || !password.trim() || !phone.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !selectedFile) {
       toast.warn("Please fill in all required fields (marked with *), including your Photo Upload");
+      return;
+    }
+
+    // Name alphabet validation (only letters and spaces)
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(name.trim())) {
+      toast.warn("Full Name must contain only alphabets and spaces");
+      return;
+    }
+
+    // Phone number 10-digit validation
+    const cleanPhone = phone.trim().replace(/\D/g, "");
+    if (cleanPhone.length !== 10) {
+      toast.warn("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -126,7 +146,7 @@ const Register = () => {
       payload.append("email", email.trim().toLowerCase());
       payload.append("password", password);
       payload.append("role", "student");
-      if (formData.phone) payload.append("phone", formData.phone.trim());
+      payload.append("phone", cleanPhone);
       payload.append("rollNumber", rollNumber.trim().toUpperCase());
       payload.append("course", course);
       payload.append("semester", formData.semester);
@@ -188,7 +208,7 @@ const Register = () => {
                     type="text"
                     name="name"
                     className="form-control-custom with-icon"
-                    placeholder="Enter your full name"
+                    placeholder="Enter your full name (alphabets only)"
                     value={formData.name}
                     onChange={handleChange}
                     disabled={isLoading}
@@ -236,17 +256,22 @@ const Register = () => {
               </div>
 
               <div className="col-md-6 mb-3">
-                <label className="form-label-custom">Phone Number</label>
+                <label className="form-label-custom">Phone Number *</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><FiPhone size={16} /></span>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
                     className="form-control-custom with-icon"
-                    placeholder="10 digit number"
+                    placeholder="10 digit phone number"
                     value={formData.phone}
-                    onChange={handleChange}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setFormData((p) => ({ ...p, phone: val }));
+                    }}
                     disabled={isLoading}
+                    required
                   />
                 </div>
               </div>

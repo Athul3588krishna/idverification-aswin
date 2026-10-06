@@ -127,7 +127,23 @@ export const deleteUserAPI = async (id) => {
  * @returns {{ success, user, message }}
  */
 export const studentRegisterAPI = async (userData) => {
-  const { data } = await axiosInstance.post("/auth/student-register", userData);
+  const isFormData = userData instanceof FormData;
+  const { data } = await axiosInstance.post("/auth/student-register", userData, isFormData ? {
+    headers: { "Content-Type": "multipart/form-data" }
+  } : {});
+  return data;
+};
+
+/**
+ * uploadStudentPhotoAPI
+ * PUT /api/auth/me/photo
+ * @param {FormData} formData
+ * @returns {{ success, photoUrl, user, message }}
+ */
+export const uploadStudentPhotoAPI = async (formData) => {
+  const { data } = await axiosInstance.put("/auth/me/photo", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
   return data;
 };
 

@@ -75,6 +75,7 @@ const Students = () => {
       if (data.success) {
         setAutoApproveState(data.autoApprove);
         toast.success(data.message);
+        fetchStudents();
       }
     } catch (err) {
       toast.error("Failed to update auto-approve setting");
@@ -141,9 +142,9 @@ const Students = () => {
     });
 
     socket.on("student_status_updated", (data) => {
-      if (data.allApproved) {
+      if (data.allApproved || data.newStudent || data.autoApprove !== undefined) {
         fetchStudents();
-      } else {
+      } else if (data.userId) {
         setStudents((prev) =>
           prev.map((student) =>
             student._id === data.userId ? { ...student, isActive: data.isActive } : student

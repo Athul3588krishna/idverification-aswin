@@ -65,7 +65,8 @@ const loadUsers = () => {
           idNumber: "123456789012",
           examSubject: "MCA Entrance Examination 2026",
           examDate: "2026-08-10",
-          examTime: "10:00 AM - 1:00 PM"
+          examTime: "10:00 AM - 1:00 PM",
+          idCardImageUrl: "/uploads/idCard-1785335641398-891055875.jpeg"
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

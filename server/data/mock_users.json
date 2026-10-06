@@ -31,11 +31,17 @@
       "course": "MCA",
       "semester": 2,
       "examCenter": "Hall A - Room 101",
+      "allocatedHall": "Block B - Room 204",
+      "allocatedSeat": "Desk #18",
+      "checkInStatus": "NOT_ARRIVED",
+      "checkInTime": null,
+      "qrToken": "EXAM-MCA26001-2026",
       "dob": "1998-05-15",
       "idNumber": "123456789012",
       "examSubject": "MCA Entrance Examination 2026",
       "examDate": "2026-08-10",
-      "examTime": "10:00 AM - 1:00 PM"
+      "examTime": "10:00 AM - 1:00 PM",
+      "idCardImageUrl": "/uploads/idCard-1785335641398-891055875.jpeg"
     },
     "createdAt": "2026-07-28T01:09:37.868Z",
     "updatedAt": "2026-07-28T01:09:37.868Z"
@@ -52,6 +58,11 @@
       "dob": "2001-05-20",
       "idNumber": "987654321012",
       "examCenter": "Hall A - Room 102",
+      "allocatedHall": "Block B - Room 204",
+      "allocatedSeat": "Desk #19",
+      "checkInStatus": "NOT_ARRIVED",
+      "checkInTime": null,
+      "qrToken": "EXAM-MCA25393-2026",
       "examSubject": "Entrance Examination 2026",
       "examDate": "2026-08-10",
       "examTime": "10:00 AM - 1:00 PM"
@@ -73,6 +84,11 @@
       "dob": "2001-05-20",
       "idNumber": "987654321012",
       "examCenter": "Hall A - Room 102",
+      "allocatedHall": "Block B - Room 204",
+      "allocatedSeat": "Desk #20",
+      "checkInStatus": "NOT_ARRIVED",
+      "checkInTime": null,
+      "qrToken": "EXAM-MCA22072-2026",
       "examSubject": "Entrance Examination 2026",
       "examDate": "2026-08-10",
       "examTime": "10:00 AM - 1:00 PM"

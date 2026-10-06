@@ -11,6 +11,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const { protect, authorize } = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 const asyncHandler = require("express-async-handler");
 
 // ── GET /api/students ──
@@ -78,6 +79,14 @@ router.post(
       throw new Error("Aadhaar number must be exactly 12 numeric digits");
     }
 
+    if (phone && phone.trim()) {
+      const cleanPhone = phone.trim().replace(/\D/g, "");
+      if (cleanPhone.length !== 10) {
+        res.status(400);
+        throw new Error("Phone number must be exactly 10 numeric digits");
+      }
+    }
+
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       res.status(409);
@@ -101,7 +110,12 @@ router.post(
       examSubject: examSubject || "Entrance Examination 2026",
       examDate: examDate || "2026-08-15",
       examTime: examTime || "10:00 AM - 1:00 PM",
-      examCenter: examCenter || "Hall A - Room 101"
+      examCenter: examCenter || "Hall A - Room 101",
+      allocatedHall: req.body.allocatedHall || "Block B - Room 204",
+      allocatedSeat: req.body.allocatedSeat || `Desk #${Math.floor(Math.random() * 30) + 1}`,
+      checkInStatus: "NOT_ARRIVED",
+      checkInTime: null,
+      qrToken: `EXAM-${rollNumber.toUpperCase()}-2026`
     };
 
     const student = await User.create({
@@ -114,6 +128,13 @@ router.post(
       createdBy: req.user._id,
       isActive: true
     });
+
+    try {
+      const { emitEvent } = require("../utils/socket");
+      emitEvent("student_status_updated", { newStudent: true, userId: student._id, isActive: true });
+    } catch (err) {
+      console.error("Socket emit error:", err.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -177,10 +198,30 @@ router.put(
     const { setAutoApprove } = require("../utils/systemConfig");
     const updated = setAutoApprove(autoApprove);
 
+    let approvedCount = 0;
+    if (updated) {
+      const pendingStudents = await User.find({ role: "student", isActive: false });
+      for (const s of pendingStudents) {
+        s.isActive = true;
+        await s.save({ validateBeforeSave: false });
+        approvedCount++;
+      }
+    }
+
+    try {
+      const { emitEvent } = require("../utils/socket");
+      emitEvent("student_status_updated", { allApproved: updated, autoApprove: updated, count: approvedCount });
+    } catch (err) {
+      console.error("Socket emit error:", err.message);
+    }
+
     res.status(200).json({
       success: true,
-      message: `Auto-approval automation has been turned ${updated ? "ON" : "OFF"}.`,
-      autoApprove: updated
+      message: updated
+        ? `Auto-approval turned ON. Approved ${approvedCount} existing pending student(s).`
+        : "Auto-approval automation has been turned OFF.",
+      autoApprove: updated,
+      count: approvedCount
     });
   })
 );
@@ -191,6 +232,7 @@ router.put(
   "/:id",
   protect,
   authorize("admin"),
+  upload.single("photo"),
   asyncHandler(async (req, res) => {
     const student = await User.findById(req.params.id);
     if (!student || student.role !== "student") {
@@ -211,6 +253,7 @@ router.put(
       examDate,
       examTime,
       examCenter,
+      idCardImageUrl,
       isActive
     } = req.body;
 
@@ -235,7 +278,18 @@ router.put(
     }
 
     if (name) student.name = name;
-    if (phone !== undefined) student.phone = phone;
+    if (phone !== undefined) {
+      if (phone && phone.trim()) {
+        const cleanPhone = phone.trim().replace(/\D/g, "");
+        if (cleanPhone.length !== 10) {
+          res.status(400);
+          throw new Error("Phone number must be exactly 10 numeric digits");
+        }
+        student.phone = cleanPhone;
+      } else {
+        student.phone = null;
+      }
+    }
     if (isActive !== undefined) student.isActive = isActive;
 
     // Update subprofile fields
@@ -255,6 +309,11 @@ router.put(
     if (examDate) student.studentProfile.examDate = examDate;
     if (examTime) student.studentProfile.examTime = examTime;
     if (examCenter) student.studentProfile.examCenter = examCenter;
+    if (req.file) {
+      student.studentProfile.idCardImageUrl = `/uploads/${req.file.filename}`;
+    } else if (idCardImageUrl !== undefined) {
+      student.studentProfile.idCardImageUrl = idCardImageUrl;
+    }
 
     await student.save();
 

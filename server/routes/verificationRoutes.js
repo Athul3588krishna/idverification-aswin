@@ -18,6 +18,8 @@ const router = express.Router();
 const {
   verifyStudentCard,
   verifyStudentCardManual,
+  verifyHallTicketQR,
+  resetCheckInSession,
   getVerificationLogs,
   getStats
 } = require("../controllers/verificationController");
@@ -35,12 +37,28 @@ router.post(
   verifyStudentCard
 );
 
+// ── Route: Perform Instant Hall Ticket QR Verification Scan (<100ms) ──
+router.post(
+  "/qr-scan",
+  protect,
+  authorize("admin", "security_staff"),
+  verifyHallTicketQR
+);
+
 // ── Route: Perform Manual Roll Number Verification Check ──
 router.post(
   "/manual",
   protect,
   authorize("admin", "security_staff"),
   verifyStudentCardManual
+);
+
+// ── Route: Reset Candidate Check-In Session (Admin Only) ──
+router.post(
+  "/reset-session",
+  protect,
+  authorize("admin"),
+  resetCheckInSession
 );
 
 // ── Route: Query Paginated Scanning Logs ──

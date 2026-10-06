@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken]     = useState(null);
   const [loading, setLoading] = useState(true); // Auth check on mount
 
-  // ── On mount: restore session from localStorage ──
+  // ── On mount: restore session from localStorage & fetch fresh profile ──
   useEffect(() => {
     const storedToken = localStorage.getItem("examshield_token");
     const storedUser  = localStorage.getItem("examshield_user");
@@ -45,6 +45,14 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(parsedUser);
+
+        // Fetch freshest profile from server so photo & approval status sync immediately
+        axiosInstance.get("/auth/me").then(({ data }) => {
+          if (data?.success && data.user) {
+            setUser(data.user);
+            localStorage.setItem("examshield_user", JSON.stringify(data.user));
+          }
+        }).catch(() => {});
       } catch {
         // Corrupted storage — clear it
         localStorage.removeItem("examshield_token");

@@ -8,7 +8,8 @@
  */
 
 import React, { useRef } from "react";
-import { FiPrinter, FiX, FiShield, FiCheckCircle } from "react-icons/fi";
+import { FiPrinter, FiX, FiShield, FiCheckCircle, FiUser, FiMapPin, FiClock } from "react-icons/fi";
+import { QRCodeSVG } from "qrcode.react";
 
 const AdmitCard = ({ student, onClose }) => {
   const printRef = useRef();
@@ -20,6 +21,13 @@ const AdmitCard = ({ student, onClose }) => {
   if (!student) return null;
 
   const profile = student.studentProfile || {};
+  const serverBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api").replace(/\/api$/, "");
+  const photoPath = profile.idCardImageUrl || student.idCardImageUrl;
+  const photoUrl = photoPath
+    ? (photoPath.startsWith("http://") || photoPath.startsWith("https://") || photoPath.startsWith("data:")
+        ? photoPath
+        : `${serverBaseUrl}${photoPath.startsWith("/") ? "" : "/"}${photoPath}`)
+    : null;
 
   return (
     <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.85)", zIndex: 1050, overflowY: "auto" }}>
@@ -80,6 +88,10 @@ const AdmitCard = ({ student, onClose }) => {
                         <td className="fw-bold py-1 text-primary text-uppercase">: {profile.rollNumber || "N/A"}</td>
                       </tr>
                       <tr>
+                        <td className="fw-bold text-muted text-uppercase py-1">Phone Number</td>
+                        <td className="fw-bold py-1">: {student.phone || profile.phone || "N/A"}</td>
+                      </tr>
+                      <tr>
                         <td className="fw-bold text-muted text-uppercase py-1">Course / Stream</td>
                         <td className="fw-bold py-1 text-uppercase">: {profile.course || "N/A"} (Semester {profile.semester || 1})</td>
                       </tr>
@@ -98,22 +110,71 @@ const AdmitCard = ({ student, onClose }) => {
                 {/* Photo & Barcode (Right Side) */}
                 <div className="col-4 d-flex flex-column align-items-center justify-content-start border-start border-light ps-4">
                   {/* Photo Frame */}
-                  <div className="photo-frame mb-3 d-flex align-items-center justify-content-center text-muted fw-bold border border-dark" style={{ width: "120px", height: "140px", backgroundColor: "#f8f9fa" }}>
-                    PASSPORT PHOTO
+                  <div
+                    className="photo-frame mb-3 d-flex align-items-center justify-content-center border border-dark overflow-hidden position-relative rounded-1"
+                    style={{
+                      width: "125px",
+                      height: "150px",
+                      backgroundColor: "#f8f9fa",
+                      boxShadow: "inset 0 0 4px rgba(0,0,0,0.15)"
+                    }}
+                  >
+                    {photoUrl ? (
+                      <img
+                        src={photoUrl}
+                        alt={student.name || "Candidate Photo"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block"
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const fallback = e.currentTarget.parentElement.querySelector(".photo-fallback");
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="photo-fallback flex-column align-items-center justify-content-center text-muted text-center p-2"
+                      style={{
+                        display: photoUrl ? "none" : "flex",
+                        height: "100%",
+                        width: "100%",
+                        fontSize: "0.75rem",
+                        fontWeight: "600"
+                      }}
+                    >
+                      <FiUser size={28} className="mb-1 text-secondary opacity-50" />
+                      <span>PASSPORT PHOTO</span>
+                    </div>
                   </div>
-                  {/* Simulated barcode */}
-                  <div className="barcode-simulation text-center py-2 px-3 border border-dark bg-light rounded w-100">
-                    <div className="barcode-lines mb-1" style={{ height: "30px", background: "repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 8px)" }}></div>
-                    <small className="fw-bold text-uppercase" style={{ fontSize: "0.7rem", letterSpacing: "0.2em" }}>{profile.rollNumber || "MCA26002"}</small>
+                  {/* Authentic Security QR Code */}
+                  <div className="barcode-simulation text-center py-2 px-2 border border-dark bg-light rounded w-100 d-flex flex-column align-items-center justify-content-center">
+                    <QRCodeSVG
+                      value={profile.qrToken || `EXAM-${profile.rollNumber || "MCA26001"}-2026`}
+                      size={84}
+                      level="M"
+                    />
+                    <small className="fw-bold text-uppercase mt-1" style={{ fontSize: "0.65rem", letterSpacing: "0.1em" }}>
+                      {profile.qrToken || `EXAM-${profile.rollNumber || "MCA26001"}-2026`}
+                    </small>
+                    <small className="text-muted text-uppercase" style={{ fontSize: "0.55rem" }}>Scan for Fast Gate Entry</small>
                   </div>
                 </div>
               </div>
 
-              {/* Exam Schedule details */}
+              {/* Exam Schedule, Hall & Seat Details */}
               <div className="border border-dark rounded p-3 my-4 bg-light">
-                <h5 className="fw-bold mb-3 text-uppercase border-bottom border-secondary pb-1" style={{ fontSize: "0.95rem" }}>Examination Schedule & Venue</h5>
-                <div className="row">
-                  <div className="col-md-6 mb-2">
+                <div className="d-flex justify-content-between align-items-center border-bottom border-secondary pb-1 mb-3">
+                  <h5 className="fw-bold m-0 text-uppercase" style={{ fontSize: "0.95rem" }}>Examination Schedule & Seating Allocation</h5>
+                  <span className={`badge ${profile.checkInStatus === "CHECKED_IN" ? "bg-success" : "bg-warning text-dark"} text-uppercase px-2 py-1`} style={{ fontSize: "0.7rem" }}>
+                    {profile.checkInStatus === "CHECKED_IN" ? "✓ Gate Admitted (Checked In)" : "Pending Gate Verification"}
+                  </span>
+                </div>
+                <div className="row g-2">
+                  <div className="col-md-5 mb-2">
                     <small className="text-muted d-block fw-bold">SUBJECT</small>
                     <span className="fw-bold text-uppercase">{profile.examSubject || "Entrance Examination 2026"}</span>
                   </div>
@@ -122,9 +183,23 @@ const AdmitCard = ({ student, onClose }) => {
                     <span className="fw-bold">{profile.examDate || "2026-08-10"}</span>
                     <small className="d-block text-muted">{profile.examTime || "10:00 AM - 1:00 PM"}</small>
                   </div>
-                  <div className="col-md-3 mb-2">
-                    <small className="text-muted d-block fw-bold">VENUE / EXAM CENTER</small>
-                    <span className="fw-bold text-uppercase">{profile.examCenter || "Hall A - Room 102"}</span>
+                  <div className="col-md-4 mb-2">
+                    <small className="text-muted d-block fw-bold">EXAM CENTER</small>
+                    <span className="fw-bold text-uppercase">{profile.examCenter || "Main Campus Hall"}</span>
+                  </div>
+                  
+                  {/* Real-World Seating Allocation Card */}
+                  <div className="col-12 mt-2 pt-2 border-top border-secondary-subtle">
+                    <div className="d-flex align-items-center justify-content-between bg-white p-2 rounded border border-dark">
+                      <div>
+                        <small className="text-muted fw-bold d-block text-uppercase" style={{ fontSize: "0.65rem" }}>Assigned Examination Hall</small>
+                        <span className="fw-bold text-primary fs-6">{profile.allocatedHall || "Block B - Room 204"}</span>
+                      </div>
+                      <div className="text-end">
+                        <small className="text-muted fw-bold d-block text-uppercase" style={{ fontSize: "0.65rem" }}>Assigned Desk Number</small>
+                        <span className="badge bg-primary fs-6 px-3 py-1">{profile.allocatedSeat || "Desk #18"}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -186,24 +261,30 @@ const AdmitCard = ({ student, onClose }) => {
         
         /* Print media query override */
         @media print {
+          @page {
+            size: auto;
+            margin: 10mm;
+          }
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
           #admit-card-print-area, #admit-card-print-area * {
-            visibility: visible;
+            visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           #admit-card-print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
             background: #fff !important;
             color: #000 !important;
           }
           .modal {
-            position: absolute;
+            position: absolute !important;
             background: none !important;
             overflow: visible !important;
           }
@@ -218,9 +299,22 @@ const AdmitCard = ({ student, onClose }) => {
             border: 0 !important;
           }
           .admit-card-container {
-            border: 1px solid #000 !important;
+            border: 1.5px solid #000 !important;
             box-shadow: none !important;
-            padding: 1.5cm !important;
+            padding: 1.2cm !important;
+          }
+          .photo-frame {
+            border: 1px solid #000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .photo-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           .d-print-none {
             display: none !important;
