@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MCA26003 - SNEHA SANTHOSH</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+  body { background: #ffffff; padding: 0; margin: 0; width: 850px; height: 500px; }
+  
+  .id-card {
+    width: 850px;
+    height: 500px;
+    background: #ffffff;
+    border: 3px solid #1e3a8a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #1e3a8a;
+    color: #ffffff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #f59e0b;
+  }
+
+  .header-titles h1 {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .header-titles h2 {
+    font-size: 13px;
+    color: #fef08a;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-session {
+    background: #f59e0b;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .card-body {
+    display: flex;
+    padding: 24px 28px;
+    flex: 1;
+    gap: 24px;
+    background: #ffffff;
+    align-items: center;
+  }
+
+  .photo-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .photo-frame {
+    width: 130px;
+    height: 165px;
+    border: 2px solid #000000;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame svg {
+    width: 100%;
+    height: 100%;
+  }
+  .id-badge-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 10px;
+    text-transform: uppercase;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 6px 0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .label-cell {
+    width: 140px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+  .value-cell {
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+  .roll-val {
+    font-size: 22px;
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .qr-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 14px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .qr-box {
+    background: #ffffff;
+    padding: 6px;
+    border: 2px solid #000000;
+  }
+  .qr-box img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+  .qr-code-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .card-footer {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 2px solid #cbd5e1;
+  }
+  .signature-text {
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 16px;
+    color: #1e3a8a;
+  }
+</style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="card-header">
+      <div class="header-titles">
+        <h1>STATE TECHNOLOGICAL UNIVERSITY</h1>
+        <h2>OFFICIAL STUDENT IDENTITY CARD</h2>
+      </div>
+      <div class="badge-session">VALID: 2025 - 2027</div>
+    </div>
+    <div class="card-body">
+      <div class="photo-col">
+        <div class="photo-frame">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+      <rect width="100" height="120" fill="#9333ea"/>
+      <path d="M 22 36 Q 50 10 78 36 Q 84 80 72 90 Q 50 80 28 90 Q 16 80 22 36 Z" fill="#3b0764"/>
+      <circle cx="50" cy="42" r="20" fill="#fed7aa"/>
+      <path d="M 30 32 Q 50 20 70 32 Q 50 26 30 32 Z" fill="#3b0764"/>
+      <path d="M 20 110 Q 20 74 50 74 Q 80 74 80 110 Z" fill="#831843"/>
+      <polygon points="44,74 56,74 53,92 50,96 47,92" fill="#fef08a"/>
+      <polygon points="38,74 44,74 46,92 40,92" fill="#ffffff"/>
+      <polygon points="62,74 56,74 54,92 60,92" fill="#ffffff"/>
+    
+          </svg>
+        </div>
+        <div class="id-badge-tag">REGULAR STUDENT</div>
+      </div>
+      <div class="details-col">
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">STUDENT NAME:</td>
+            <td class="value-cell">SNEHA SANTHOSH</td>
+          </tr>
+          <tr>
+            <td class="label-cell">ROLL NUMBER:</td>
+            <td class="value-cell roll-val">MCA26003</td>
+          </tr>
+          <tr>
+            <td class="label-cell">COURSE:</td>
+            <td class="value-cell">MCA (SEMESTER 2)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">DATE OF BIRTH:</td>
+            <td class="value-cell">2002-03-14</td>
+          </tr>
+          <tr>
+            <td class="label-cell">AADHAAR / ID NO:</td>
+            <td class="value-cell">3456 7890 1234</td>
+          </tr>
+          <tr>
+            <td class="label-cell">BLOOD GROUP:</td>
+            <td class="value-cell">A+ | VALIDITY: 31-07-2027</td>
+          </tr>
+        </table>
+      </div>
+      <div class="qr-col">
+        <div class="qr-box">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAYAAACuwEE+AAAAAklEQVR4AewaftIAAAMMSURBVO3BQW4YBxADwSax//8yk1NOIyMU1pBks0r5FzP/k5kpmJmCmSmYmYKZKZiZwsMvSOInSMJXkcQlCRdJ/ARJuJiZgpkpmJmCmSmYmcLDJyThK0jiT5WEryCJhpkpmJmCmSmYmYKZKTy8SBJvSMIbJNFIwkck8RUk8YYkvMHMFMxMwcwUzEzBzBQe/kJJeEsS/iZmpmBmCmamYGYKZqbw8BeSxCUJH0nCRRKXJPyJzEzBzBTMTMHMFMxM4eFFSfgJknCRRCsJv1MSvhMzUzAzBTNTMDMFM1N4+ARJ/G2ScJHEJQkNSfwEZqZgZgpmpmBmCmamoPyLP5QkLkmYzzEzBTNTMDMFM1MwM4WHX5DEJQkXSXyFJFyS8BZJXJLQkMRXSMIbzEzBzBTMTMHMFMxM4eELJeENkmgkoZWEiyQuSbgk4SKJSxIakrhIopGEi5kpmJmCmSmYmYKZKTz8QhIukvgKkrgk4SKJhiQ+koTvRBKXJFwkcUlCw8wUzEzBzBTMTMHMFMxM4eETknCRREMSjSS8QRKXJPwUSfgKZqZgZgpmpmBmCmam8PAJkrgk4SKJRhIukrgk4ZKEiyQukvhIEr4TSVyScEnCRRKXJFzMTMHMFMxMwcwUzEzh4ROS0EjCG5LQkMQlCRdJfDeSuCThIolLEt5gZgpmpmBmCmamYGYKD78giZ8gCZckfDeSuCShIYk3JKFhZgpmpmBmCmamYGYKD5+QhK8giYYkLkl4SxIukmhI4pKERhIukrgkoWFmCmamYGYKZqZgZgoPL5LEG5Lw3UiikYSGJN4giUsSLpK4JOFiZgpmpmBmCmamYGYKD/OfJLQk8YYkXCRxScJFEo0kNMxMwcwUzEzBzBTMTOFh/iOJjyThd5LEJQmNJPxOZqZgZgpmpmBmCmam8PCiJHwnSWgk4SOS+J2S0JDEJQkNSVyScDEzBTNTMDMFM1MwM4WHT5DETyCJRhJaSWhIopGEhiQuSbgkoWFmCmamYGYKZqZgZgrKv5j5n8xMwcwUzEzBzBTMTOEfmtcSDqP6lwIAAAAASUVORK5CYII=" alt="QR">
+        </div>
+        <div class="qr-code-text">EXAM-MCA26003-2026</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>CARD ID: ID-2026-MCA26003</span>
+      <span>HOLDER SIGN: <span class="signature-text">SNEHA</span></span>
+      <span>REGISTRAR: <span class="signature-text">Dr. K. S. Pillai</span></span>
+    </div>
+  </div>
+</body>
+</html>

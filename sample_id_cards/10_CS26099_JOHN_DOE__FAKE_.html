@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CS26099 - JOHN DOE (FAKE)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+  body { background: #ffffff; padding: 0; margin: 0; width: 850px; height: 500px; }
+  
+  .id-card {
+    width: 850px;
+    height: 500px;
+    background: #ffffff;
+    border: 3px solid #dc2626;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #991b1b;
+    color: #ffffff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #f87171;
+  }
+
+  .header-titles h1 {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .header-titles h2 {
+    font-size: 13px;
+    color: #fee2e2;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-session {
+    background: #fee2e2;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .card-body {
+    display: flex;
+    padding: 24px 28px;
+    flex: 1;
+    gap: 24px;
+    background: #ffffff;
+    align-items: center;
+  }
+
+  .photo-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .photo-frame {
+    width: 130px;
+    height: 165px;
+    border: 2px solid #000000;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame svg {
+    width: 100%;
+    height: 100%;
+  }
+  .id-badge-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 10px;
+    text-transform: uppercase;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 6px 0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .label-cell {
+    width: 140px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+  .value-cell {
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+  .roll-val {
+    font-size: 22px;
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .qr-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 14px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .qr-box {
+    background: #ffffff;
+    padding: 6px;
+    border: 2px solid #000000;
+  }
+  .qr-box img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+  .qr-code-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .card-footer {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 2px solid #cbd5e1;
+  }
+  .signature-text {
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 16px;
+    color: #dc2626;
+  }
+</style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="card-header">
+      <div class="header-titles">
+        <h1>STATE TECHNOLOGICAL UNIVERSITY</h1>
+        <h2>OFFICIAL STUDENT IDENTITY CARD</h2>
+      </div>
+      <div class="badge-session">VALID: 2025 - 2027</div>
+    </div>
+    <div class="card-body">
+      <div class="photo-col">
+        <div class="photo-frame">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+      <rect width="100" height="120" fill="#475569"/>
+      <circle cx="50" cy="42" r="22" fill="#cbd5e1"/>
+      <path d="M 20 110 Q 20 72 50 72 Q 80 72 80 110 Z" fill="#cbd5e1"/>
+      <text x="50" y="48" font-size="20" font-family="Arial" font-weight="bold" fill="#dc2626" text-anchor="middle">?</text>
+    
+          </svg>
+        </div>
+        <div class="id-badge-tag">INVALID CARD</div>
+      </div>
+      <div class="details-col">
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">STUDENT NAME:</td>
+            <td class="value-cell">JOHN DOE (FAKE)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">ROLL NUMBER:</td>
+            <td class="value-cell roll-val">CS26099</td>
+          </tr>
+          <tr>
+            <td class="label-cell">COURSE:</td>
+            <td class="value-cell">B.TECH CSE (SEMESTER 6)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">DATE OF BIRTH:</td>
+            <td class="value-cell">1999-07-20</td>
+          </tr>
+          <tr>
+            <td class="label-cell">AADHAAR / ID NO:</td>
+            <td class="value-cell">9999 8888 7777</td>
+          </tr>
+          <tr>
+            <td class="label-cell">BLOOD GROUP:</td>
+            <td class="value-cell">UNKNOWN | VALIDITY: 31-07-2027</td>
+          </tr>
+        </table>
+      </div>
+      <div class="qr-col">
+        <div class="qr-box">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAYAAACuwEE+AAAAAklEQVR4AewaftIAAAMASURBVO3BQW4bWQBDwUei739ljldZfQmhpwVZMauUL8z8JTNTMDMFM1MwMwUzUzAzhYsnJPEJkvBqkjhJQkMSnyAJJ2amYGYKZqZgZgpmpnDxDUl4B0ncQRKtJJxI4iQJjSS8gyQaZqZgZgpmpmBmCmamcHEjSdwhCXeQxF0kcZKEV5LEHZJwBzNTMDMFM1MwMwUzU7iYP5LwiCQGzEzBzBTMTMHMFMxM4WL+F0mcJOFfZGYKZqZgZgpmpmBmChc3SsK/KgknknilJPwkZqZgZgpmpmBmCmamcPENkvhkSTiRxCNJeCVJfAIzUzAzBTNTMDMFM1O4eCIJv0kSHpHEHZLwycxMwcwUzEzBzBTMTOHiCUmcJOFEEu+QhJMknEiilYQTSTQk8Q5JuIOZKZiZgpkpmJmCmSlcPJGEE0k0ktCQxEkSTiTRSMKJJF4tCQ1JnCThRBInkmgk4cTMFMxMwcwUzEzBzBQunpDESRLeQRInSTiRRCMJj0jiJAknkrhDEk4kcZKEE0mcJKFhZgpmpmBmCmamYGYKZqZw8Q2SeKUkNCTRkMRJEh5JwjtI4iQJ72BmCmamYGYKZqZgZgrKFz6EJH6aJJxI4iQJDUk0ktCQxEkSTsxMwcwUzEzBzBTMTOHigyShIYm7JOFEEg1JNJLQkMRJEu5gZgpmpmBmCmamYGYKF09I4hMk4SQJJ5J4tSQ0JNGQxDuYmYKZKZiZgpkpmJnCxTck4R0k0ZDEu0iikYQ7JKGRhIaZKZiZgpkpmJmCmSlc3EgSd0jCTyOJkyScSOIkCSeSOElCQxInSTiRxEkSTsxMwcwUzEzBzBTMTOHiF0rCXSTRkMRJEk4kcZKEE0k0ktAwMwUzUzAzBTNTMDOFi19IEq0kNJJwhyT8JGamYGYKZqZgZgpmpnBxoyT8JEloSOIRSbyDJF5JEidJODEzBTNTMDMFM1MwM4WLb5DEJ5BEIwktSbxSEl4pCQ0zUzAzBTNTMDMFM1NQvjDzl8xMwcwUzEzBzBTMTOE/w1z0KX1AYloAAAAASUVORK5CYII=" alt="QR">
+        </div>
+        <div class="qr-code-text">EXAM-CS26099-2026</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>CARD ID: ID-2026-CS26099</span>
+      <span>HOLDER SIGN: <span class="signature-text">JOHN</span></span>
+      <span>REGISTRAR: <span class="signature-text">Dr. K. S. Pillai</span></span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CS26081 - GOKUL DAS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+  body { background: #ffffff; padding: 0; margin: 0; width: 850px; height: 500px; }
+  
+  .id-card {
+    width: 850px;
+    height: 500px;
+    background: #ffffff;
+    border: 3px solid #1e3a8a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #1e3a8a;
+    color: #ffffff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #f59e0b;
+  }
+
+  .header-titles h1 {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .header-titles h2 {
+    font-size: 13px;
+    color: #fef08a;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-session {
+    background: #f59e0b;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .card-body {
+    display: flex;
+    padding: 24px 28px;
+    flex: 1;
+    gap: 24px;
+    background: #ffffff;
+    align-items: center;
+  }
+
+  .photo-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .photo-frame {
+    width: 130px;
+    height: 165px;
+    border: 2px solid #000000;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame svg {
+    width: 100%;
+    height: 100%;
+  }
+  .id-badge-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 10px;
+    text-transform: uppercase;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 6px 0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .label-cell {
+    width: 140px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+  .value-cell {
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+  .roll-val {
+    font-size: 22px;
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .qr-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 14px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .qr-box {
+    background: #ffffff;
+    padding: 6px;
+    border: 2px solid #000000;
+  }
+  .qr-box img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+  .qr-code-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .card-footer {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 2px solid #cbd5e1;
+  }
+  .signature-text {
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 16px;
+    color: #1e3a8a;
+  }
+</style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="card-header">
+      <div class="header-titles">
+        <h1>STATE TECHNOLOGICAL UNIVERSITY</h1>
+        <h2>OFFICIAL STUDENT IDENTITY CARD</h2>
+      </div>
+      <div class="badge-session">VALID: 2025 - 2027</div>
+    </div>
+    <div class="card-body">
+      <div class="photo-col">
+        <div class="photo-frame">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+      <rect width="100" height="120" fill="#059669"/>
+      <circle cx="50" cy="42" r="22" fill="#fed7aa"/>
+      <path d="M 28 35 Q 50 15 72 35 Q 65 20 50 20 Q 35 20 28 35 Z" fill="#1e293b"/>
+      <path d="M 20 110 Q 20 72 50 72 Q 80 72 80 110 Z" fill="#14532d"/>
+      <polygon points="46,72 54,72 52,94 50,98 48,94" fill="#f97316"/>
+      <polygon points="38,72 46,72 48,94 42,94" fill="#ffffff"/>
+      <polygon points="62,72 54,72 52,94 58,94" fill="#ffffff"/>
+    
+          </svg>
+        </div>
+        <div class="id-badge-tag">REGULAR STUDENT</div>
+      </div>
+      <div class="details-col">
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">STUDENT NAME:</td>
+            <td class="value-cell">GOKUL DAS</td>
+          </tr>
+          <tr>
+            <td class="label-cell">ROLL NUMBER:</td>
+            <td class="value-cell roll-val">CS26081</td>
+          </tr>
+          <tr>
+            <td class="label-cell">COURSE:</td>
+            <td class="value-cell">B.TECH CSE (SEMESTER 6)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">DATE OF BIRTH:</td>
+            <td class="value-cell">2002-12-05</td>
+          </tr>
+          <tr>
+            <td class="label-cell">AADHAAR / ID NO:</td>
+            <td class="value-cell">8901 2345 6789</td>
+          </tr>
+          <tr>
+            <td class="label-cell">BLOOD GROUP:</td>
+            <td class="value-cell">O- | VALIDITY: 31-07-2027</td>
+          </tr>
+        </table>
+      </div>
+      <div class="qr-col">
+        <div class="qr-box">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAYAAACuwEE+AAAAAklEQVR4AewaftIAAAMJSURBVO3BQW4cVwBDwUei739lRkAAr74EU+nOaGxWKR+Y+U1mpmBmCmamYGYKZqZgZgoXX5DEO0hCQxKtJNxBEu8gCSdmpmBmCmamYGYKZqZw8Q1JeAVJPCkJn5HESRLukIRXkETDzBTMTMHMFMxMwcwULm4kiTsk4Q6SOEnCXSRxkoQ7SOIOSbiDmSmYmYKZKZiZgpkpXPyFJHGXJPxNzEzBzBTMTMHMFMxM4WL+E0mcJOFPZGYKZqZgZgpmpmBmChc3SsI7S0JLEk9Kwk9iZgpmpmBmCmamYGYKF98giXeWhBNJfCYJT5LEOzAzBTNTMDMFM1MwM4WLLyRh/iWJOyThnZmZgpkpmJmCmSmYmcLFFyRxkoQTSbxCEk6ScJcknEiiIYlXSMIdzEzBzBTMTMHMFMxM4eJGSWhI4iQJd5DESRKeJoknJeFEEieSaCThxMwUzEzBzBTMTMHMFC6+kISGJJ4kiUYS7iKJkyScSOIkCSeSOEnCiSROknAiiZMkNMxMwcwUzEzBzBTMTMHMFC7+B0k4kUQjCQ1JNJJwlyTcQRInSXgFM1MwMwUzUzAzBTNTUD7wCUk8KQkNSTSScCKJkyR8RhInSTiRRCMJJ5JoJKEhiZMknJiZgpkpmJmCmSmYmYLygT+UJE6ScBdJPCkJDUmcJOFEEidJODEzBTNTMDMFM1MwM4WLL0jiHSThJAknkmgloZGEhiQakngFM1MwMwUzUzAzBTNTuPiGJLyCJBqSOEnC0yTRSMIdktBIQsPMFMxMwcwUzEzBzBQubiSJOyThFSTRSsKJJE6ScCKJkyQ0JHGShBNJnCThxMwUzEzBzBTMTMHMFC7mlyS0JNGQxEkSTiRxkoQTSTSS0DAzBTNTMDMFM1MwM4WL+UUSn0lCIwl3SMJPYmYKZqZgZgpmpmBmChc3SsJPkoQTSbQk8QqSeJIkTpJwYmYKZqZgZgpmpmBmChffIIl3IImTJNxFEk9KwpOS0DAzBTNTMDMFM1MwMwXlAzO/ycwUzEzBzBTMTMHMFP4B7lkEHySHkJEAAAAASUVORK5CYII=" alt="QR">
+        </div>
+        <div class="qr-code-text">EXAM-CS26081-2026</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>CARD ID: ID-2026-CS26081</span>
+      <span>HOLDER SIGN: <span class="signature-text">GOKUL</span></span>
+      <span>REGISTRAR: <span class="signature-text">Dr. K. S. Pillai</span></span>
+    </div>
+  </div>
+</body>
+</html>

@@ -83,12 +83,21 @@ const studentProfileSchema = new mongoose.Schema(
     examDate: {
       type: String,
       trim: true,
-      default: "2026-08-15",
+      default: "",
     },
     examTime: {
       type: String,
       trim: true,
-      default: "10:00 AM - 1:00 PM",
+      default: "",
+    },
+    telegramChatId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    photoUrl: {
+      type: String,
+      default: null, // Path to student's passport photo (displayed on Admit Card)
     },
     idCardImageUrl: {
       type: String,
@@ -97,12 +106,12 @@ const studentProfileSchema = new mongoose.Schema(
     allocatedHall: {
       type: String,
       trim: true,
-      default: "Main Block - Room 204",
+      default: "",
     },
     allocatedSeat: {
       type: String,
       trim: true,
-      default: "Desk #18",
+      default: "",
     },
     checkInStatus: {
       type: String,

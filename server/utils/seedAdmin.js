@@ -58,7 +58,9 @@ const seedAdmin = async () => {
       console.log("   Password: Security@123\n");
     }
 
-    // 3. Seed Demo Student
+    // 3. Demo Student seeding is disabled so student roster starts completely clean.
+    // Uncomment below if a pre-seeded student account is ever needed.
+    /*
     const studentExists = await User.findOne({ email: "aswin@examshield.com" });
     if (!studentExists) {
       await User.create({
@@ -77,13 +79,11 @@ const seedAdmin = async () => {
           examSubject: "MCA Entrance Examination 2026",
           examDate: "2026-08-10",
           examTime: "10:00 AM - 1:00 PM",
-          idCardImageUrl: "/uploads/idCard-1785335641398-891055875.jpeg"
+          idCardImageUrl: "/uploads/photo_MCA26001.png"
         }
       });
-      console.log("✅ Default student account created:");
-      console.log("   Email   : aswin@examshield.com");
-      console.log("   Password: Student@123\n");
     }
+    */
 
   } catch (error) {
     console.error("❌ Failed to seed database:", error.message);

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExamShield - 10 Sample Student ID Cards Test Suite</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  .card-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+    border-color: #3b82f6;
+  }
+  .card-img-preview {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-bottom: 2px solid #334155;
+    background: #fff;
+  }
+  .badge-approved { background-color: #059669; }
+  .badge-suspended { background-color: #dc2626; }
+  .badge-unregistered { background-color: #991b1b; }
+</style>
+</head>
+<body class="py-5">
+
+<div class="container">
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 mb-2">
+      <i class="bi bi-shield-check"></i> ExamShield Gate Identity Verification Test Suite
+    </div>
+    <h1 class="fw-bold display-5">Official 10 Sample Student ID Cards</h1>
+    <p class="text-secondary fs-6 max-w-700 mx-auto">
+      These realistic institutional Student Identity Cards contain the candidate's personal credentials (Name, Roll No, DOB, Aadhaar, Blood Group).
+      <span class="text-info d-block mt-1">Specific Room & Desk Number allocations are kept confidential and are dynamically assigned to the candidate's <strong>Hall Ticket</strong> upon Admin verification.</span>
+    </p>
+  </div>
+
+  <!-- Testing Guidance Banner -->
+  <div class="alert alert-dark border-secondary p-4 rounded-3 mb-5">
+    <h5 class="fw-bold text-info"><i class="bi bi-info-circle-fill me-2"></i>How to Test in ExamShield:</h5>
+    <div class="row g-3 mt-1">
+      <div class="col-md-4">
+        <div class="p-3 bg-secondary bg-opacity-10 rounded border border-secondary border-opacity-25 h-100">
+          <strong class="text-light d-block mb-1">1. OCR ID Card Scan</strong>
+          <small class="text-secondary">Click <em>Download PNG</em> on any card below, open <a href="http://localhost:5173/verify" target="_blank" class="text-primary text-decoration-none">http://localhost:5173/verify</a>, upload the card in <strong>OCR mode</strong>. The system extracts Name, Roll No, DOB, and Aadhaar to verify!</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-secondary bg-opacity-10 rounded border border-secondary border-opacity-25 h-100">
+          <strong class="text-light d-block mb-1">2. Dynamic Seating Guidance</strong>
+          <small class="text-secondary">When verified, the gate scanner announces the candidate's assigned room & desk (e.g. <code>Block B - Room 204 [Desk #18]</code>) and marks them Checked In!</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-secondary bg-opacity-10 rounded border border-secondary border-opacity-25 h-100">
+          <strong class="text-light d-block mb-1">3. Anti-Passback Test</strong>
+          <small class="text-secondary">Scan <strong>Card #01 (MCA26001)</strong> once to approve and admit. Then immediately upload it again to witness the live <em>Duplicate Entry Alarm</em>!</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="row g-4">
+    
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/01_MCA26001_ASWIN_KRISHNA.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/01_MCA26001_ASWIN_KRISHNA.png" alt="ASWIN KRISHNA" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #01 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">ASWIN KRISHNA</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>MCA26001</code> | MCA (B+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) & Anti-Passback Test (Rescanning triggers Duplicate Entry Alert)</div>
+                <div class="mt-1"><strong>DOB:</strong> 1998-05-15 | <strong>Aadhaar:</strong> 1234 5678 9012</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block B - Room 204 [Desk #18]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/01_MCA26001_ASWIN_KRISHNA.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('MCA26001'); alert('Copied Roll Number: MCA26001');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-MCA26001-2026'); alert('Copied QR Token: EXAM-MCA26001-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="01_MCA26001_ASWIN_KRISHNA.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/02_MCA26002_ATHUL_KRISHNA.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/02_MCA26002_ATHUL_KRISHNA.png" alt="ATHUL KRISHNA" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #02 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">ATHUL KRISHNA</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>MCA26002</code> | MCA (O+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Block A Desk #05</div>
+                <div class="mt-1"><strong>DOB:</strong> 2001-08-22 | <strong>Aadhaar:</strong> 2345 6789 0123</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block A - Room 102 [Desk #05]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/02_MCA26002_ATHUL_KRISHNA.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('MCA26002'); alert('Copied Roll Number: MCA26002');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-MCA26002-2026'); alert('Copied QR Token: EXAM-MCA26002-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="02_MCA26002_ATHUL_KRISHNA.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/03_MCA26003_SNEHA_SANTHOSH.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/03_MCA26003_SNEHA_SANTHOSH.png" alt="SNEHA SANTHOSH" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #03 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">SNEHA SANTHOSH</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>MCA26003</code> | MCA (A+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Block B Desk #12</div>
+                <div class="mt-1"><strong>DOB:</strong> 2002-03-14 | <strong>Aadhaar:</strong> 3456 7890 1234</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block B - Room 201 [Desk #12]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/03_MCA26003_SNEHA_SANTHOSH.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('MCA26003'); alert('Copied Roll Number: MCA26003');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-MCA26003-2026'); alert('Copied QR Token: EXAM-MCA26003-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="03_MCA26003_SNEHA_SANTHOSH.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/04_MCA26004_RAHUL_NAIR.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/04_MCA26004_RAHUL_NAIR.png" alt="RAHUL NAIR" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-suspended text-uppercase px-2 py-1">REJECTED (BARRED)</span>
+                <span class="text-secondary small fw-bold">Card #04 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">RAHUL NAIR</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>MCA26004</code> | MCA (AB+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Suspended Candidate (Fee Dues / Administrative Bar) -> Rejection Alert & Locked Seating</div>
+                <div class="mt-1"><strong>DOB:</strong> 2000-11-30 | <strong>Aadhaar:</strong> 4567 8901 2345</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> 🔒 Locked (Pending Admin Verification)</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/04_MCA26004_RAHUL_NAIR.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('MCA26004'); alert('Copied Roll Number: MCA26004');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-MCA26004-2026'); alert('Copied QR Token: EXAM-MCA26004-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="04_MCA26004_RAHUL_NAIR.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/05_MCA26005_ANJALI_MENON.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/05_MCA26005_ANJALI_MENON.png" alt="ANJALI MENON" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #05 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">ANJALI MENON</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>MCA26005</code> | MCA (O+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Block C Desk #22</div>
+                <div class="mt-1"><strong>DOB:</strong> 2001-06-18 | <strong>Aadhaar:</strong> 5678 9012 3456</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block C - Room 301 [Desk #22]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/05_MCA26005_ANJALI_MENON.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('MCA26005'); alert('Copied Roll Number: MCA26005');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-MCA26005-2026'); alert('Copied QR Token: EXAM-MCA26005-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="05_MCA26005_ANJALI_MENON.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/06_BCA26021_HARISANKAR_P.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/06_BCA26021_HARISANKAR_P.png" alt="HARISANKAR P" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #06 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">HARISANKAR P</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>BCA26021</code> | BCA (B+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Block C Desk #08</div>
+                <div class="mt-1"><strong>DOB:</strong> 2003-01-25 | <strong>Aadhaar:</strong> 6789 0123 4567</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block C - Room 302 [Desk #08]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/06_BCA26021_HARISANKAR_P.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('BCA26021'); alert('Copied Roll Number: BCA26021');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-BCA26021-2026'); alert('Copied QR Token: EXAM-BCA26021-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="06_BCA26021_HARISANKAR_P.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/07_BCA26022_FATHIMA_R.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/07_BCA26022_FATHIMA_R.png" alt="FATHIMA R" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #07 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">FATHIMA R</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>BCA26022</code> | BCA (A+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Block D Desk #14</div>
+                <div class="mt-1"><strong>DOB:</strong> 2002-09-09 | <strong>Aadhaar:</strong> 7890 1234 5678</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Block D - Room 401 [Desk #14]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/07_BCA26022_FATHIMA_R.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('BCA26022'); alert('Copied Roll Number: BCA26022');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-BCA26022-2026'); alert('Copied QR Token: EXAM-BCA26022-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="07_BCA26022_FATHIMA_R.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/08_CS26081_GOKUL_DAS.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/08_CS26081_GOKUL_DAS.png" alt="GOKUL DAS" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-approved text-uppercase px-2 py-1">APPROVED</span>
+                <span class="text-secondary small fw-bold">Card #08 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">GOKUL DAS</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>CS26081</code> | B.Tech CSE (O-)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Normal Gate Admission (Active Candidate) -> Allocated Lab 1 Desk #03</div>
+                <div class="mt-1"><strong>DOB:</strong> 2002-12-05 | <strong>Aadhaar:</strong> 8901 2345 6789</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> Lab 1 - Ground Floor [Desk #03]</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/08_CS26081_GOKUL_DAS.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('CS26081'); alert('Copied Roll Number: CS26081');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-CS26081-2026'); alert('Copied QR Token: EXAM-CS26081-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="08_CS26081_GOKUL_DAS.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/09_CS26082_MEERA_PILLAI.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/09_CS26082_MEERA_PILLAI.png" alt="MEERA PILLAI" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-suspended text-uppercase px-2 py-1">REJECTED (SUSPENDED)</span>
+                <span class="text-secondary small fw-bold">Card #09 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">MEERA PILLAI</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>CS26082</code> | B.Tech CSE (B+)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Disciplinary Barred Candidate (Suspended) -> Entry Denied & Seating Locked</div>
+                <div class="mt-1"><strong>DOB:</strong> 2001-04-17 | <strong>Aadhaar:</strong> 9012 3456 7890</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> 🔒 Locked (Pending Admin Verification)</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/09_CS26082_MEERA_PILLAI.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('CS26082'); alert('Copied Roll Number: CS26082');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-CS26082-2026'); alert('Copied QR Token: EXAM-CS26082-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="09_CS26082_MEERA_PILLAI.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card-box h-100 d-flex flex-column">
+          <!-- Card Image Preview -->
+          <a href="cards_images/10_CS26099_JOHN_DOE__FAKE_.png" target="_blank" title="Click to view full image">
+            <img src="cards_images/10_CS26099_JOHN_DOE__FAKE_.png" alt="JOHN DOE (FAKE)" class="card-img-preview" />
+          </a>
+          
+          <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-unregistered text-uppercase px-2 py-1">REJECTED (NOT FOUND)</span>
+                <span class="text-secondary small fw-bold">Card #10 of 10</span>
+              </div>
+              <h4 class="fw-bold mb-1">JOHN DOE (FAKE)</h4>
+              <p class="text-primary fw-bold mb-2">Roll No: <code>CS26099</code> | B.Tech CSE (UNKNOWN)</p>
+              
+              <div class="bg-black bg-opacity-25 p-3 rounded mb-3 text-secondary small">
+                <div><strong>Test Purpose:</strong> Fraudulent / Imposter ID Card (Not in Database) -> Rejection: Roll number not found</div>
+                <div class="mt-1"><strong>DOB:</strong> 1999-07-20 | <strong>Aadhaar:</strong> 9999 8888 7777</div>
+                <div class="mt-1"><strong>Allocated Hall Ticket Seating:</strong> 🔒 Locked (Pending Admin Verification)</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+              <a href="cards_images/10_CS26099_JOHN_DOE__FAKE_.png" download class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-download"></i> Download ID Card
+              </a>
+              <button class="btn btn-sm btn-outline-light d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('CS26099'); alert('Copied Roll Number: CS26099');">
+                <i class="bi bi-clipboard"></i> Copy Roll
+              </button>
+              <button class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" onclick="navigator.clipboard.writeText('EXAM-CS26099-2026'); alert('Copied QR Token: EXAM-CS26099-2026');">
+                <i class="bi bi-qr-code"></i> Copy QR Token
+              </button>
+              <a href="10_CS26099_JOHN_DOE__FAKE_.html" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-box-arrow-up-right"></i> HTML
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-5 pt-4 text-center text-secondary border-top border-secondary border-opacity-25">
+    <p>ExamShield Automated Identity Verification Project &copy; 2026 - MEA Engineering College</p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

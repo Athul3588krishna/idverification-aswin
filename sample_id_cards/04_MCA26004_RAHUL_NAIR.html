@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MCA26004 - RAHUL NAIR</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+  body { background: #ffffff; padding: 0; margin: 0; width: 850px; height: 500px; }
+  
+  .id-card {
+    width: 850px;
+    height: 500px;
+    background: #ffffff;
+    border: 3px solid #b91c1c;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #7f1d1d;
+    color: #ffffff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #ef4444;
+  }
+
+  .header-titles h1 {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .header-titles h2 {
+    font-size: 13px;
+    color: #fee2e2;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-session {
+    background: #fee2e2;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .card-body {
+    display: flex;
+    padding: 24px 28px;
+    flex: 1;
+    gap: 24px;
+    background: #ffffff;
+    align-items: center;
+  }
+
+  .photo-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .photo-frame {
+    width: 130px;
+    height: 165px;
+    border: 2px solid #000000;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame svg {
+    width: 100%;
+    height: 100%;
+  }
+  .id-badge-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 10px;
+    text-transform: uppercase;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 6px 0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .label-cell {
+    width: 140px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+  .value-cell {
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+  .roll-val {
+    font-size: 22px;
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .qr-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 14px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .qr-box {
+    background: #ffffff;
+    padding: 6px;
+    border: 2px solid #000000;
+  }
+  .qr-box img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+  .qr-code-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .card-footer {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 2px solid #cbd5e1;
+  }
+  .signature-text {
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 16px;
+    color: #1e3a8a;
+  }
+</style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="card-header">
+      <div class="header-titles">
+        <h1>STATE TECHNOLOGICAL UNIVERSITY</h1>
+        <h2>OFFICIAL STUDENT IDENTITY CARD</h2>
+      </div>
+      <div class="badge-session">VALID: 2025 - 2027</div>
+    </div>
+    <div class="card-body">
+      <div class="photo-col">
+        <div class="photo-frame">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+      <rect width="100" height="120" fill="#dc2626"/>
+      <circle cx="50" cy="42" r="22" fill="#ffedd5"/>
+      <path d="M 28 35 Q 50 15 72 35 Q 65 20 50 20 Q 35 20 28 35 Z" fill="#451a03"/>
+      <path d="M 20 110 Q 20 72 50 72 Q 80 72 80 110 Z" fill="#451a03"/>
+      <polygon points="46,72 54,72 52,94 50,98 48,94" fill="#eab308"/>
+      <polygon points="38,72 46,72 48,94 42,94" fill="#ffffff"/>
+      <polygon points="62,72 54,72 52,94 58,94" fill="#ffffff"/>
+    
+          </svg>
+        </div>
+        <div class="id-badge-tag">SUSPENDED PASS</div>
+      </div>
+      <div class="details-col">
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">STUDENT NAME:</td>
+            <td class="value-cell">RAHUL NAIR</td>
+          </tr>
+          <tr>
+            <td class="label-cell">ROLL NUMBER:</td>
+            <td class="value-cell roll-val">MCA26004</td>
+          </tr>
+          <tr>
+            <td class="label-cell">COURSE:</td>
+            <td class="value-cell">MCA (SEMESTER 2)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">DATE OF BIRTH:</td>
+            <td class="value-cell">2000-11-30</td>
+          </tr>
+          <tr>
+            <td class="label-cell">AADHAAR / ID NO:</td>
+            <td class="value-cell">4567 8901 2345</td>
+          </tr>
+          <tr>
+            <td class="label-cell">BLOOD GROUP:</td>
+            <td class="value-cell">AB+ | VALIDITY: 31-07-2027</td>
+          </tr>
+        </table>
+      </div>
+      <div class="qr-col">
+        <div class="qr-box">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAYAAACuwEE+AAAAAklEQVR4AewaftIAAAMbSURBVO3BgW0YCRRCwQfa/lvmUsCPFay1HOeYUX5h5g+ZmYKZKZiZgpkpmJmCmSk8fEASP0ESGpK4JOF3JNFIwkUSP0ESLmamYGYKZqZgZgpmpvDwCUn4DpJoSOKShFYSvlISvoMkGmamYGYKZqZgZgpmpvDwIkm8IQl/G0k0kvAGSbwhCW8wMwUzUzAzBTNTMDOFh/8hSbSSMGBmCmamYGYKZqZgZgoP/7AkXCRxSUJLEpck/IvMTMHMFMxMwcwUzEzh4UVJ+FdJ4pKEr5SEv4mZKZiZgpkpmJmCmSk8fIIkfgJJXJJwkcTvJOEiiUsSGpL4CcxMwcwUzEzBzBTMTEH5hX+UJN6ShAEzUzAzBTNTMDMFM1N4+IAkLkn4DpK4JOENSfgdSVyScJFEIwkNSbwhCQ0zUzAzBTNTMDMFM1N4+EASGpK4JKEhiUsSLpK4JKEhid9JwkUSlyRcJNGQxCUJF0l8JTNTMDMFM1MwMwUzU3h4URIakrgk4SKJSxIukmgk4asl4SKJSxIukrgk4SKJN5iZgpkpmJmCmSmYmYKZKTx8QBKXJDQkcUlCIwlvSMLfJgmNJHwHM1MwMwUzUzAzBTNTePhAEi6S+EqS+EqS+GqS+EpJ+A5mpmBmCmamYGYKZqbw8AlJ+EpJeIMk3pKEiyQuSXiDJBqSuCThIolLEi5mpmBmCmamYGYKZqbw8AFJ/ARJuCShIYm3SKKRhEsSLpJ4QxIaZqZgZgpmpmBmCmam8PAJSfgOkvhKSWgl4SKJN0iikYSLJBpJuJiZgpkpmJmCmSmYmcLDiyTxhiR8B0l8F0lcknCRxEUSlyRcJNEwMwUzUzAzBTNTMDOFh/8hSVyS0JJEIwkXSVwkcUnCRRKNJDTMTMHMFMxMwcwUzEzhYf6IJN4giTdI4pKEiyQaSbiYmYKZKZiZgpkpmJnCw4uS8BMk4SKJtyShIYlLEi6SaCThIomGmSmYmYKZKZiZgpkpPHyCJH4CSVyS8JYkNCTxlSRxScIlCQ0zUzAzBTNTMDMFM1NQfmHmD5mZgpkpmJmCmSmYmcJ/HJoJOM/EKiwAAAAASUVORK5CYII=" alt="QR">
+        </div>
+        <div class="qr-code-text">EXAM-MCA26004-2026</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>CARD ID: ID-2026-MCA26004</span>
+      <span>HOLDER SIGN: <span class="signature-text">RAHUL</span></span>
+      <span>REGISTRAR: <span class="signature-text">Dr. K. S. Pillai</span></span>
+    </div>
+  </div>
+</body>
+</html>

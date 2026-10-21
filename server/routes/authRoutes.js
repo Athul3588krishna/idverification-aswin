@@ -48,6 +48,7 @@ const {
   updateUserStatus,
   deleteUser,
   uploadStudentPhoto,
+  extractIdCardDetails,
 } = require("../controllers/authController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -68,7 +69,13 @@ router.post("/login", loginUser);
  * POST /api/auth/student-register
  * Public registration endpoint for students.
  */
-router.post("/student-register", upload.single("idCardImage"), studentRegister);
+router.post("/student-register", upload.any(), studentRegister);
+
+/**
+ * POST /api/auth/extract-id
+ * Public endpoint to extract student details via OCR from uploaded ID card.
+ */
+router.post("/extract-id", upload.single("idCardImage"), extractIdCardDetails);
 
 /**
  * POST /api/auth/send-otp

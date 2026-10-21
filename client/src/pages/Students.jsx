@@ -25,23 +25,28 @@ import {
   FiInfo,
   FiClock,
   FiCheckCircle,
-  FiUsers
+  FiUsers,
+  FiFileText,
+  FiZap,
+  FiSend
 } from "react-icons/fi";
 import Navbar from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 import Loader from "../components/common/Loader";
+import AdmitCard from "../components/AdmitCard";
 import {
   getAllUsersAPI,
   updateUserStatusAPI,
   deleteUserAPI,
   approveAllStudentsAPI,
   getAutoApproveAPI,
-  setAutoApproveAPI
+  setAutoApproveAPI,
+  notifyStudentTelegramAPI
 } from "../api/authAPI";
 import { io } from "socket.io-client";
-import { FiZap } from "react-icons/fi";
 
 const Students = () => {
+  const serverBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api").replace(/\/api$/, "");
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialFilter = queryParams.get("filter") || "all";
@@ -55,6 +60,7 @@ const Students = () => {
   const [totalStudents, setTotalStudents] = useState(0);
   const [autoApprove, setAutoApproveState] = useState(false);
   const [togglingAutoApprove, setTogglingAutoApprove] = useState(false);
+  const [selectedStudentForCard, setSelectedStudentForCard] = useState(null);
 
   const fetchAutoApproveStatus = async () => {
     try {
@@ -208,6 +214,17 @@ const Students = () => {
     }
   };
 
+  const handleSendTelegram = async (student) => {
+    try {
+      const data = await notifyStudentTelegramAPI(student._id);
+      if (data.success) {
+        toast.success(`📱 ${data.message || "Telegram notification sent!"}`);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send Telegram notification");
+    }
+  };
+
   return (
     <div className="gradient-bg min-vh-100 d-flex flex-column">
       <Navbar />
@@ -312,7 +329,7 @@ const Students = () => {
                       <th>Roll Number</th>
                       <th>Course</th>
                       <th>Sem</th>
-                      <th>Exam Center Venue</th>
+                      <th>Allocated Venue & Seating</th>
                       <th>Approval Status</th>
                       <th className="text-end">Actions</th>
                     </tr>
@@ -321,8 +338,66 @@ const Students = () => {
                     {students.map((student) => (
                       <tr key={student._id}>
                         <td>
-                          <div className="fw-semibold text-light">{student.name}</div>
-                          <small className="text-muted d-block">{student.email}</small>
+                          <div className="d-flex align-items-center gap-2">
+                            {(() => {
+                              const roll = (student.studentProfile?.rollNumber || "").toUpperCase();
+                              const rawPhoto =
+                                student.studentProfile?.photoUrl ||
+                                student.photoUrl ||
+                                (roll ? `/uploads/photo_${roll}.png` : null) ||
+                                student.studentProfile?.idCardImageUrl;
+                              const photoSrc = rawPhoto
+                                ? (rawPhoto.startsWith("http") || rawPhoto.startsWith("data:")
+                                    ? rawPhoto
+                                    : `${serverBaseUrl}${rawPhoto.startsWith('/') ? '' : '/'}${rawPhoto}`)
+                                : null;
+                              return photoSrc ? (
+                                <img
+                                  src={photoSrc}
+                                  alt={student.name}
+                                  style={{
+                                    width: "36px",
+                                    height: "36px",
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                    border: "1px solid rgba(255,255,255,0.2)",
+                                    flexShrink: 0
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    width: "36px",
+                                    height: "36px",
+                                    borderRadius: "50%",
+                                    background: "rgba(255,255,255,0.1)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "var(--text-muted)",
+                                    fontSize: "0.8rem",
+                                    fontWeight: "bold",
+                                    flexShrink: 0
+                                  }}
+                                >
+                                  {student.name?.charAt(0) || "S"}
+                                </div>
+                              );
+                            })()}
+                            <div>
+                              <div className="fw-semibold text-light">{student.name}</div>
+                              <small className="text-muted d-block">{student.email}</small>
+                              {student.studentProfile?.telegramChatId ? (
+                                <small className="text-info d-block" style={{ fontSize: "0.72rem" }}>
+                                  📱 Telegram: <code>{student.studentProfile.telegramChatId}</code>
+                                </small>
+                              ) : (
+                                <small className="text-muted d-block" style={{ fontSize: "0.72rem" }}>
+                                  📱 Telegram: Not linked
+                                </small>
+                              )}
+                            </div>
+                          </div>
                         </td>
                         <td>
                           <span className="badge" style={{ background: "var(--primary-glow)", color: "var(--primary-light)", border: "1px solid var(--border-focus)" }}>
@@ -331,22 +406,69 @@ const Students = () => {
                         </td>
                         <td>{student.studentProfile?.course || "N/A"}</td>
                         <td>Sem {student.studentProfile?.semester || "N/A"}</td>
-                        <td className="text-wrap" style={{ maxWidth: "200px" }}>{student.studentProfile?.examCenter || "N/A"}</td>
+                        <td className="text-wrap" style={{ maxWidth: "230px" }}>
+                          {student.isActive && student.studentProfile?.allocatedHall ? (
+                            <div>
+                              <div className="fw-semibold text-light" style={{ fontSize: "0.85rem" }}>
+                                {student.studentProfile?.allocatedHall}
+                              </div>
+                              <span className="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 mt-1 me-1" style={{ fontSize: "0.75rem" }}>
+                                {student.studentProfile?.allocatedSeat || "Desk Assigned"}
+                              </span>
+                              {student.studentProfile?.examDate && (
+                                <small className="text-success d-block mt-1" style={{ fontSize: "0.72rem" }}>
+                                  📅 {student.studentProfile.examDate} ({student.studentProfile.examTime || "10:00 AM"})
+                                </small>
+                              )}
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25" style={{ fontSize: "0.75rem" }}>
+                                🔒 Date & Room Confidential
+                              </span>
+                              <small className="text-secondary d-block mt-1" style={{ fontSize: "0.7rem" }}>
+                                Assigned & sent via Telegram upon approval
+                              </small>
+                            </div>
+                          )}
+                        </td>
                         <td>
                           <span className={student.isActive ? "badge-success" : "badge-warning"}>
-                            {student.isActive ? "APPROVED / ACTIVE" : "PENDING APPROVAL"}
+                            {student.isActive ? "APPROVED / ALLOCATED" : "PENDING APPROVAL"}
                           </span>
                         </td>
                         <td className="text-end">
-                          <div className="d-inline-flex gap-2">
+                          <div className="d-inline-flex gap-2 align-items-center">
+                            {/* Preview Admit Card */}
+                            <button
+                              onClick={() => setSelectedStudentForCard(student)}
+                              className="btn btn-sm btn-outline-info"
+                              style={{ padding: "0.3rem 0.5rem" }}
+                              title="Preview Hall Ticket / Admit Card"
+                            >
+                              <FiFileText size={16} />
+                            </button>
+
+                            {/* Resend Telegram Notification (if approved) */}
+                            {student.isActive && (
+                              <button
+                                onClick={() => handleSendTelegram(student)}
+                                className="btn btn-sm btn-outline-primary"
+                                style={{ padding: "0.3rem 0.5rem" }}
+                                title="Send / Resend Telegram Exam Notification"
+                              >
+                                <FiSend size={15} />
+                              </button>
+                            )}
+
                             {/* Prominent Approve Button for Pending Candidates */}
                             {!student.isActive ? (
                               <button
                                 onClick={() => handleToggleStatus(student._id, student.isActive)}
                                 className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-bold"
-                                title="Approve Student Account"
+                                title="Approve & Allocate Exam Hall & Desk (Notifies via Telegram)"
                               >
-                                <FiUserCheck size={16} /> Approve Candidate
+                                <FiUserCheck size={16} /> Approve & Allocate Seat
                               </button>
                             ) : (
                               <button
@@ -406,6 +528,14 @@ const Students = () => {
           </div>
         </main>
       </div>
+
+      {/* Candidate Admit Card / Hall Ticket Modal */}
+      {selectedStudentForCard && (
+        <AdmitCard
+          student={selectedStudentForCard}
+          onClose={() => setSelectedStudentForCard(null)}
+        />
+      )}
     </div>
   );
 };

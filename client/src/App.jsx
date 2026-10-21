@@ -44,7 +44,11 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/student/login" element={<StudentLogin />} />
+          <Route path="/student" element={<StudentLogin />} />
+          <Route path="/student-login" element={<StudentLogin />} />
           <Route path="/student/register" element={<Register />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<AdminLogin />} /> {/* Fallback/shortcut */}

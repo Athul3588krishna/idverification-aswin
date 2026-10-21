@@ -153,9 +153,72 @@ router.put(
   asyncHandler(async (req, res) => {
     const students = await User.find({ role: "student", isActive: false });
     let count = 0;
+    const halls = [
+      "Block A - Room 101",
+      "Block A - Room 102",
+      "Block B - Room 201",
+      "Block B - Room 204",
+      "Block C - Room 301",
+      "Block C - Room 302",
+      "Block D - Room 401",
+      "Lab 1 - Ground Floor",
+      "Lab 2 - First Floor"
+    ];
+
     for (const s of students) {
       s.isActive = true;
+      if (!s.studentProfile) s.studentProfile = {};
+      s.studentProfile.adminVerified = true;
+      s.studentProfile.adminVerifiedAt = new Date();
+
+      if (!s.studentProfile.examDate || s.studentProfile.examDate.includes("Pending")) {
+        s.studentProfile.examDate = "2026-08-10";
+      }
+      if (!s.studentProfile.examTime || s.studentProfile.examTime.includes("Pending")) {
+        s.studentProfile.examTime = "10:00 AM - 1:00 PM";
+      }
+      if (!s.studentProfile.allocatedHall || s.studentProfile.allocatedHall.includes("Pending")) {
+        s.studentProfile.allocatedHall = halls[count % halls.length];
+      }
+      if (!s.studentProfile.allocatedSeat || s.studentProfile.allocatedSeat.includes("Pending")) {
+        s.studentProfile.allocatedSeat = `Desk #${(count % 30) + 1}`;
+      }
+      if (!s.studentProfile.examCenter || s.studentProfile.examCenter.includes("Pending")) {
+        s.studentProfile.examCenter = "State University Main Examination Complex";
+      }
+
       await s.save({ validateBeforeSave: false });
+
+      // Send Telegram notification with Exam Date, Room, and Time
+      try {
+        const { sendTelegramApprovalNotification } = require("../utils/telegram");
+        sendTelegramApprovalNotification({
+          chatId: s.studentProfile?.telegramChatId,
+          studentName: s.name,
+          rollNumber: s.studentProfile?.rollNumber || "N/A",
+          course: s.studentProfile?.course,
+          examSubject: s.studentProfile?.examSubject || "Entrance Examination 2026",
+          examDate: s.studentProfile?.examDate,
+          examTime: s.studentProfile?.examTime,
+          allocatedHall: s.studentProfile?.allocatedHall,
+          allocatedSeat: s.studentProfile?.allocatedSeat,
+          examCenter: s.studentProfile?.examCenter
+        }).catch((err) => console.warn(`[Telegram Error for ${s.name}]:`, err.message));
+      } catch (err) {}
+
+      // Send approval notification email
+      try {
+        const { sendApprovalEmail } = require("../utils/mailer");
+        sendApprovalEmail(
+          s.email,
+          s.name,
+          s.studentProfile?.rollNumber || "N/A",
+          s.studentProfile?.allocatedHall,
+          s.studentProfile?.allocatedSeat,
+          s.studentProfile?.examSubject
+        ).catch(() => {});
+      } catch (err) {}
+
       count++;
     }
 
@@ -290,10 +353,14 @@ router.put(
         student.phone = null;
       }
     }
+    const wasInactive = !student.isActive;
     if (isActive !== undefined) student.isActive = isActive;
 
     // Update subprofile fields
     if (!student.studentProfile) student.studentProfile = {};
+    if (req.body.telegramChatId !== undefined) {
+      student.studentProfile.telegramChatId = req.body.telegramChatId.trim();
+    }
     if (course) student.studentProfile.course = course;
     if (semester) student.studentProfile.semester = Math.min(Math.max(Number(semester) || 1, 1), 20);
     if (dob) student.studentProfile.dob = dob;
@@ -310,9 +377,48 @@ router.put(
     if (examTime) student.studentProfile.examTime = examTime;
     if (examCenter) student.studentProfile.examCenter = examCenter;
     if (req.file) {
+      student.studentProfile.photoUrl = `/uploads/${req.file.filename}`;
       student.studentProfile.idCardImageUrl = `/uploads/${req.file.filename}`;
     } else if (idCardImageUrl !== undefined) {
       student.studentProfile.idCardImageUrl = idCardImageUrl;
+    }
+
+    // If activating candidate, ensure date/time/hall/seat are present and notify via Telegram
+    if (student.isActive && wasInactive) {
+      student.studentProfile.adminVerified = true;
+      student.studentProfile.adminVerifiedAt = new Date();
+
+      if (!student.studentProfile.examDate || student.studentProfile.examDate.includes("Pending")) {
+        student.studentProfile.examDate = "2026-08-10";
+      }
+      if (!student.studentProfile.examTime || student.studentProfile.examTime.includes("Pending")) {
+        student.studentProfile.examTime = "10:00 AM - 1:00 PM";
+      }
+      if (!student.studentProfile.allocatedHall || student.studentProfile.allocatedHall.includes("Pending")) {
+        student.studentProfile.allocatedHall = "Block B - Room 204";
+      }
+      if (!student.studentProfile.allocatedSeat || student.studentProfile.allocatedSeat.includes("Pending")) {
+        student.studentProfile.allocatedSeat = `Desk #${Math.floor(Math.random() * 30) + 1}`;
+      }
+      if (!student.studentProfile.examCenter || student.studentProfile.examCenter.includes("Pending")) {
+        student.studentProfile.examCenter = "State University Main Examination Complex";
+      }
+
+      try {
+        const { sendTelegramApprovalNotification } = require("../utils/telegram");
+        sendTelegramApprovalNotification({
+          chatId: student.studentProfile?.telegramChatId,
+          studentName: student.name,
+          rollNumber: student.studentProfile?.rollNumber || "N/A",
+          course: student.studentProfile?.course,
+          examSubject: student.studentProfile?.examSubject || "Entrance Examination 2026",
+          examDate: student.studentProfile?.examDate,
+          examTime: student.studentProfile?.examTime,
+          allocatedHall: student.studentProfile?.allocatedHall,
+          allocatedSeat: student.studentProfile?.allocatedSeat,
+          examCenter: student.studentProfile?.examCenter
+        }).catch((err) => console.warn("[Telegram Error]:", err.message));
+      } catch (err) {}
     }
 
     await student.save();
@@ -321,6 +427,68 @@ router.put(
       success: true,
       message: "Student candidate updated successfully",
       user: student.toPublicJSON()
+    });
+  })
+);
+
+// ── POST /api/students/:id/notify-telegram ──
+// Manually triggers or resends Telegram exam notification for a candidate.
+router.post(
+  "/:id/notify-telegram",
+  protect,
+  authorize("admin"),
+  asyncHandler(async (req, res) => {
+    const student = await User.findById(req.params.id);
+    if (!student || student.role !== "student") {
+      res.status(404);
+      throw new Error("Student candidate not found");
+    }
+
+    const { sendTelegramApprovalNotification } = require("../utils/telegram");
+    const result = await sendTelegramApprovalNotification({
+      chatId: req.body.chatId || student.studentProfile?.telegramChatId,
+      studentName: student.name,
+      rollNumber: student.studentProfile?.rollNumber || "N/A",
+      course: student.studentProfile?.course,
+      examSubject: student.studentProfile?.examSubject || "Entrance Examination 2026",
+      examDate: student.studentProfile?.examDate || "2026-08-10",
+      examTime: student.studentProfile?.examTime || "10:00 AM - 1:00 PM",
+      allocatedHall: student.studentProfile?.allocatedHall || "Block B - Room 204",
+      allocatedSeat: student.studentProfile?.allocatedSeat || "Desk #18",
+      examCenter: student.studentProfile?.examCenter || "State University Main Examination Complex"
+    });
+
+    res.status(200).json({
+      success: true,
+      result,
+      message: result.delivered
+        ? `Telegram notification sent successfully to ${student.name}!`
+        : `Notification logged (${result.message || "Simulated / Logged in server console"})`
+    });
+  })
+);
+
+// ── POST /api/students/test-telegram ──
+// Allows testing Telegram Bot connectivity directly.
+router.post(
+  "/test-telegram",
+  protect,
+  authorize("admin"),
+  asyncHandler(async (req, res) => {
+    const { chatId } = req.body;
+    const { sendTelegramMessage } = require("../utils/telegram");
+
+    const result = await sendTelegramMessage(
+      chatId,
+      `🔔 <b>ExamShield System Test Notification</b>\n\nTelegram Bot connection is working perfectly! System is ready to notify candidates upon registration approval.`
+    );
+
+    res.status(200).json({
+      success: result.success,
+      result,
+      message: result.delivered
+        ? "Telegram test message delivered successfully!"
+        : (result.message || "Test completed")
     });
   })
 );

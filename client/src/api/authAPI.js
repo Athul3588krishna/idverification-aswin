@@ -159,6 +159,19 @@ export const sendOTPAPI = async (payload) => {
 };
 
 /**
+ * extractIdCardDetailsAPI
+ * POST /api/auth/extract-id (Public)
+ * @param {FormData} formData
+ * @returns {{ success, message, extracted }}
+ */
+export const extractIdCardDetailsAPI = async (formData) => {
+  const { data } = await axiosInstance.post("/auth/extract-id", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+};
+
+/**
  * approveAllStudentsAPI
  * PUT /api/students/approve-all (Admin only)
  */
@@ -184,3 +197,22 @@ export const setAutoApproveAPI = async (autoApprove) => {
   const { data } = await axiosInstance.put("/students/auto-approve", { autoApprove });
   return data;
 };
+
+/**
+ * notifyStudentTelegramAPI
+ * POST /api/students/:id/notify-telegram (Admin only)
+ */
+export const notifyStudentTelegramAPI = async (id, chatId) => {
+  const { data } = await axiosInstance.post(`/students/${id}/notify-telegram`, { chatId });
+  return data;
+};
+
+/**
+ * testTelegramAPI
+ * POST /api/students/test-telegram (Admin only)
+ */
+export const testTelegramAPI = async (chatId) => {
+  const { data } = await axiosInstance.post("/students/test-telegram", { chatId });
+  return data;
+};
+

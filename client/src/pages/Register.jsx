@@ -10,10 +10,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FiUser, FiMail, FiLock, FiPhone, FiBook, FiCalendar, FiCreditCard, FiShield, FiArrowLeft } from "react-icons/fi";
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiPhone,
+  FiBook,
+  FiCalendar,
+  FiCreditCard,
+  FiShield,
+  FiArrowLeft,
+  FiZap,
+  FiCheckCircle,
+  FiRefreshCw,
+  FiSend,
+  FiCamera
+} from "react-icons/fi";
 
 import useAuth from "../hooks/useAuth";
-import { studentRegisterAPI, sendOTPAPI } from "../api/authAPI";
+import { studentRegisterAPI, sendOTPAPI, extractIdCardDetailsAPI } from "../api/authAPI";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -31,10 +46,9 @@ const Register = () => {
     semester: 1,
     dob: "",
     idNumber: "",
-    examCenter: "Hall A - Room 102",
+    examCenter: "Main Campus (Malappuram)",
     examSubject: "Entrance Examination 2026",
-    examDate: "2026-08-10",
-    examTime: "10:00 AM - 1:00 PM"
+    telegramChatId: ""
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -43,11 +57,86 @@ const Register = () => {
   const [sendingOTP, setSendingOTP] = useState(false);
   const [otp, setOtp] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [studentPhotoFile, setStudentPhotoFile] = useState(null);
+  const [studentPhotoPreview, setStudentPhotoPreview] = useState(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const handleStudentPhotoChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setStudentPhotoFile(file);
+      setStudentPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // OCR Auto-extraction states
+  const [isScanning, setIsScanning] = useState(false);
+  const [extractedFields, setExtractedFields] = useState([]);
+
+  const scanFileForOCR = async (file) => {
+    if (!file) return;
+    setIsScanning(true);
+    const scanPayload = new FormData();
+    scanPayload.append("idCardImage", file);
+
+    try {
+      toast.info("🔍 Scanning ID Card with OCR... Please wait.", { autoClose: 2000 });
+      const data = await extractIdCardDetailsAPI(scanPayload);
+      if (data.success && data.extracted) {
+        const ext = data.extracted;
+        const autoFilledList = [];
+
+        setFormData((prev) => {
+          const updated = { ...prev };
+          if (ext.name) {
+            updated.name = ext.name;
+            autoFilledList.push("name");
+          }
+          if (ext.rollNumber) {
+            updated.rollNumber = ext.rollNumber;
+            autoFilledList.push("rollNumber");
+          }
+          if (ext.dob) {
+            updated.dob = ext.dob;
+            autoFilledList.push("dob");
+          }
+          if (ext.idNumber) {
+            updated.idNumber = ext.idNumber;
+            autoFilledList.push("idNumber");
+          }
+          if (ext.course) {
+            updated.course = ext.course;
+            autoFilledList.push("course");
+          }
+          if (ext.semester) {
+            updated.semester = ext.semester;
+            autoFilledList.push("semester");
+          }
+          return updated;
+        });
+
+        setExtractedFields(autoFilledList);
+        if (autoFilledList.length > 0) {
+          toast.success(`✨ Auto-detected ${autoFilledList.length} fields from your ID Card!`);
+        } else {
+          toast.info("Image uploaded. Could not detect text automatically; you can type the details manually.");
+        }
+      }
+    } catch (err) {
+      console.warn("OCR auto-fill failed:", err);
+      toast.info("Could not auto-extract details from ID card. Please enter them manually.");
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      scanFileForOCR(file);
     }
   };
 
@@ -81,8 +170,8 @@ const Register = () => {
     const { name, email, password, phone, rollNumber, course, dob, idNumber } = formData;
 
     // Validate form inputs (excluding OTP)
-    if (!name.trim() || !email.trim() || !password.trim() || !phone.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || !selectedFile) {
-      toast.warn("Please fill in all required fields (marked with *), including your Photo Upload");
+    if (!name.trim() || !email.trim() || !password.trim() || !phone.trim() || !rollNumber.trim() || !course || !dob || !idNumber.trim() || (!studentPhotoFile && !selectedFile)) {
+      toast.warn("Please fill in all required fields (marked with *), including your Candidate Passport Photo");
       return;
     }
 
@@ -154,10 +243,14 @@ const Register = () => {
       payload.append("idNumber", idNumber.trim());
       payload.append("examCenter", formData.examCenter);
       payload.append("examSubject", formData.examSubject);
-      payload.append("examDate", formData.examDate);
-      payload.append("examTime", formData.examTime);
+      payload.append("telegramChatId", formData.telegramChatId ? formData.telegramChatId.trim() : "");
       payload.append("otp", otp.trim());
-      payload.append("idCardImage", selectedFile);
+      if (studentPhotoFile) {
+        payload.append("studentPhoto", studentPhotoFile);
+      }
+      if (selectedFile) {
+        payload.append("idCardImage", selectedFile);
+      }
 
       await studentRegisterAPI(payload);
 
@@ -201,7 +294,14 @@ const Register = () => {
             
             <div className="row">
               <div className="col-12 mb-3">
-                <label className="form-label-custom">Full Name *</label>
+                <label className="form-label-custom">
+                  Full Name *
+                  {extractedFields.includes("name") && (
+                    <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                      ✨ Auto-filled
+                    </span>
+                  )}
+                </label>
                 <div className="input-wrapper">
                   <span className="input-icon"><FiUser size={16} /></span>
                   <input
@@ -278,21 +378,168 @@ const Register = () => {
             </div>
 
             <div className="row">
-              <div className="col-12 mb-3">
-                <label className="form-label-custom">ID Card Reference Photo / Passport Photo *</label>
-                <div className="input-wrapper">
+              {/* 1. Candidate Passport Photo (For Admit Card) */}
+              <div className="col-md-6 mb-3">
+                <label className="form-label-custom mb-1 d-flex align-items-center justify-content-between">
+                  <span>Candidate Passport Photo *</span>
+                  <span className="badge bg-primary" style={{ fontSize: "0.68rem" }}>Admit Card Photo</span>
+                </label>
+                <div className="input-wrapper mb-2">
+                  <input
+                    type="file"
+                    name="studentPhoto"
+                    className="form-control-custom text-white py-2"
+                    accept="image/*"
+                    onChange={handleStudentPhotoChange}
+                    disabled={isLoading}
+                    style={{ background: "rgba(0,0,0,0.2)" }}
+                  />
+                </div>
+
+                {studentPhotoPreview ? (
+                  <div
+                    className="p-2 rounded d-flex align-items-center"
+                    style={{
+                      background: "rgba(25, 135, 84, 0.12)",
+                      border: "1px solid rgba(25, 135, 84, 0.3)",
+                    }}
+                  >
+                    <img
+                      src={studentPhotoPreview}
+                      alt="Passport Preview"
+                      style={{
+                        width: "48px",
+                        height: "58px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                        border: "1px solid rgba(255,255,255,0.3)",
+                      }}
+                      className="me-2"
+                    />
+                    <div style={{ overflow: "hidden" }}>
+                      <div className="text-success fw-bold" style={{ fontSize: "0.8rem" }}>
+                        <FiCheckCircle className="me-1" />
+                        Admit Card Photo Ready
+                      </div>
+                      <small className="text-muted text-truncate d-block" style={{ fontSize: "0.72rem" }}>
+                        {studentPhotoFile?.name} ({(studentPhotoFile?.size / 1024).toFixed(1)} KB)
+                      </small>
+                    </div>
+                  </div>
+                ) : (
+                  <small className="text-muted d-block" style={{ fontSize: "0.76rem" }}>
+                    📸 Official passport photo to be printed on your Hall Ticket / Admit Card.
+                  </small>
+                )}
+              </div>
+
+              {/* 2. Student ID Card (For OCR Auto-Fill & Admin Verification) */}
+              <div className="col-md-6 mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <label className="form-label-custom mb-0">
+                    Student ID Card (OCR Scan)
+                  </label>
+                  {selectedFile && !isScanning && (
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-link text-info text-decoration-none p-0 d-flex align-items-center"
+                      onClick={() => scanFileForOCR(selectedFile)}
+                      title="Re-run OCR scanning on this card image"
+                    >
+                      <FiRefreshCw size={12} className="me-1" />
+                      <span>Re-scan</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="input-wrapper mb-2">
                   <input
                     type="file"
                     name="idCardImage"
                     className="form-control-custom text-white py-2"
                     accept="image/*"
                     onChange={handleFileChange}
-                    required
-                    disabled={isLoading}
+                    disabled={isLoading || isScanning}
                     style={{ background: "rgba(0,0,0,0.2)" }}
                   />
                 </div>
-                <small className="text-muted mt-1 d-block">This image/photo will be displayed to security personnel during gate verification checks.</small>
+
+                {/* Scanning Live State */}
+                {isScanning && (
+                  <div
+                    className="p-2 rounded d-flex align-items-center text-info"
+                    style={{
+                      background: "rgba(13, 202, 240, 0.12)",
+                      border: "1px solid rgba(13, 202, 240, 0.3)",
+                      fontSize: "0.82rem",
+                    }}
+                  >
+                    <div className="spinner-border spinner-border-sm me-2 text-info" role="status"></div>
+                    <span>
+                      <FiZap className="me-1" />
+                      Scanning ID card with OCR...
+                    </span>
+                  </div>
+                )}
+
+                {/* Extracted preview banner & thumbnail */}
+                {previewUrl && !isScanning && (
+                  <div
+                    className="p-2 rounded d-flex align-items-center justify-content-between"
+                    style={{
+                      background:
+                        extractedFields.length > 0
+                          ? "rgba(25, 135, 84, 0.12)"
+                          : "rgba(255, 255, 255, 0.05)",
+                      border:
+                        extractedFields.length > 0
+                          ? "1px solid rgba(25, 135, 84, 0.3)"
+                          : "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
+                    <div className="d-flex align-items-center">
+                      <img
+                        src={previewUrl}
+                        alt="Card Preview"
+                        style={{
+                          width: "48px",
+                          height: "36px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                        }}
+                        className="me-2"
+                      />
+                      <div>
+                        {extractedFields.length > 0 ? (
+                          <div className="text-success" style={{ fontSize: "0.8rem" }}>
+                            <FiCheckCircle className="me-1" />
+                            Auto-filled {extractedFields.length} field(s)
+                          </div>
+                        ) : (
+                          <div className="text-white-50" style={{ fontSize: "0.8rem" }}>
+                            ID Card attached
+                          </div>
+                        )}
+                        <small className="text-muted d-block text-truncate" style={{ fontSize: "0.7rem", maxWidth: "120px" }}>
+                          {selectedFile?.name}
+                        </small>
+                      </div>
+                    </div>
+
+                    {extractedFields.length > 0 && (
+                      <span className="badge bg-success" style={{ fontSize: "0.68rem" }}>
+                        ✨ Auto-Filled
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {!previewUrl && !isScanning && (
+                  <small className="text-muted d-block" style={{ fontSize: "0.76rem" }}>
+                    💡 Tip: Auto-extracts Name, Roll No, DOB, and ID.
+                  </small>
+                )}
               </div>
             </div>
 
@@ -302,7 +549,14 @@ const Register = () => {
                 
                 <div className="row">
                   <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Date of Birth *</label>
+                    <label className="form-label-custom">
+                      Date of Birth *
+                      {extractedFields.includes("dob") && (
+                        <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                          ✨ Auto-filled
+                        </span>
+                      )}
+                    </label>
                     <div className="input-wrapper">
                       <span className="input-icon"><FiCalendar size={16} /></span>
                       <input
@@ -318,7 +572,14 @@ const Register = () => {
                   </div>
 
                   <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Aadhaar Number (12 Digits) *</label>
+                    <label className="form-label-custom">
+                      Aadhaar Number (12 Digits) *
+                      {extractedFields.includes("idNumber") && (
+                        <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                          ✨ Auto-filled
+                        </span>
+                      )}
+                    </label>
                     <div className="input-wrapper">
                       <span className="input-icon"><FiCreditCard size={16} /></span>
                       <input
@@ -350,7 +611,14 @@ const Register = () => {
 
                 <div className="row">
                   <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Registration / Roll Number *</label>
+                    <label className="form-label-custom">
+                      Registration / Roll Number *
+                      {extractedFields.includes("rollNumber") && (
+                        <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                          ✨ Auto-filled
+                        </span>
+                      )}
+                    </label>
                     <div className="input-wrapper">
                       <span className="input-icon"><FiUser size={16} /></span>
                       <input
@@ -367,7 +635,14 @@ const Register = () => {
                   </div>
 
                   <div className="col-md-3 mb-3">
-                    <label className="form-label-custom">Course *</label>
+                    <label className="form-label-custom">
+                      Course *
+                      {extractedFields.includes("course") && (
+                        <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                          ✨ Auto-filled
+                        </span>
+                      )}
+                    </label>
                     <div className="input-wrapper">
                       <span className="input-icon"><FiBook size={16} /></span>
                       <select
@@ -387,7 +662,14 @@ const Register = () => {
                   </div>
 
                   <div className="col-md-3 mb-3">
-                    <label className="form-label-custom">Semester *</label>
+                    <label className="form-label-custom">
+                      Semester *
+                      {extractedFields.includes("semester") && (
+                        <span className="badge bg-success ms-2 py-0 px-2" style={{ fontSize: "0.68rem" }}>
+                          ✨ Auto-filled
+                        </span>
+                      )}
+                    </label>
                     <input
                       type="number"
                       name="semester"
@@ -404,15 +686,22 @@ const Register = () => {
 
                 <div className="row">
                   <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Exam Center</label>
-                    <input
-                      type="text"
+                    <label className="form-label-custom">Preferred Examination Zone / Campus *</label>
+                    <select
                       name="examCenter"
                       className="form-control-custom"
                       value={formData.examCenter}
                       onChange={handleChange}
                       disabled={isLoading}
-                    />
+                    >
+                      <option value="Main Campus (Malappuram)">Main Campus (Malappuram)</option>
+                      <option value="North Zone Campus (Kozhikode)">North Zone Campus (Kozhikode)</option>
+                      <option value="South Zone Campus (Ernakulam)">South Zone Campus (Ernakulam)</option>
+                      <option value="Central Zone Campus (Thrissur)">Central Zone Campus (Thrissur)</option>
+                    </select>
+                    <small className="text-secondary d-block mt-1" style={{ fontSize: "0.72rem" }}>
+                      🔒 Specific Exam Hall (Room Number) & Desk Number will be allocated upon Admin Verification.
+                    </small>
                   </div>
 
                   <div className="col-md-6 mb-3">
@@ -429,29 +718,37 @@ const Register = () => {
                 </div>
 
                 <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Exam Date</label>
-                    <input
-                      type="text"
-                      name="examDate"
-                      className="form-control-custom"
-                      value={formData.examDate}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                    />
+                  <div className="col-12 mb-3">
+                    <label className="form-label-custom">
+                      Telegram Chat ID / Username * (For Exam Date & Room Notification)
+                    </label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><FiSend size={16} /></span>
+                      <input
+                        type="text"
+                        name="telegramChatId"
+                        className="form-control-custom with-icon"
+                        placeholder="e.g. 123456789 or @username"
+                        value={formData.telegramChatId}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <small className="text-info d-block mt-1" style={{ fontSize: "0.74rem" }}>
+                      📱 <strong>Important:</strong> Your Exam Date, Room (Hall) Number, and Time will be sent directly to your Telegram once the Admin approves your registration. (Tip: Send <code>/start</code> to <code>@userinfobot</code> on Telegram to check your numeric Chat ID).
+                    </small>
                   </div>
+                </div>
 
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label-custom">Exam Time</label>
-                    <input
-                      type="text"
-                      name="examTime"
-                      className="form-control-custom"
-                      value={formData.examTime}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                    />
+                {/* Confidential Scheduling Notice */}
+                <div className="p-3 mb-3 rounded" style={{ background: "rgba(99, 102, 241, 0.12)", border: "1px solid rgba(99, 102, 241, 0.3)" }}>
+                  <div className="d-flex align-items-center gap-2 text-info mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>
+                    <FiLock size={15} />
+                    <span>Confidential Exam Scheduling Protocol</span>
                   </div>
+                  <p className="text-secondary mb-0" style={{ fontSize: "0.75rem", lineHeight: "1.4" }}>
+                    To uphold strict exam integrity, specific <strong>Exam Date</strong>, <strong>Time Slot</strong>, and <strong>Allocated Room / Desk</strong> are confidential during registration and officially allocated only upon Administrator verification. You will be instantly notified via Telegram upon approval.
+                  </p>
                 </div>
               </>
             )}

@@ -30,7 +30,8 @@ import {
   FiAlertTriangle,
   FiUserCheck,
   FiZap,
-  FiCamera
+  FiCamera,
+  FiRefreshCw
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth";
@@ -101,6 +102,7 @@ const Dashboard = () => {
             ...user,
             studentProfile: {
               ...(user.studentProfile || {}),
+              photoUrl: data.photoUrl,
               idCardImageUrl: data.photoUrl,
             },
           });
@@ -905,53 +907,66 @@ const Dashboard = () => {
                         accept="image/*"
                         className="d-none"
                       />
-                      <div
-                        className="rounded-2 overflow-hidden border border-secondary shadow-sm position-relative d-flex align-items-center justify-content-center"
-                        style={{
-                          width: "56px",
-                          height: "68px",
-                          background: "rgba(255,255,255,0.05)",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => photoInputRef.current?.click()}
-                        title="Click to change candidate photo"
-                      >
-                        {(user.studentProfile?.idCardImageUrl || user.idCardImageUrl) ? (
-                          <img
-                            src={
-                              (user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith("http") ||
-                              (user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith("data:")
-                                ? (user.studentProfile?.idCardImageUrl || user.idCardImageUrl)
-                                : `${serverBaseUrl}${(user.studentProfile?.idCardImageUrl || user.idCardImageUrl).startsWith('/') ? '' : '/'}${user.studentProfile?.idCardImageUrl || user.idCardImageUrl}`
-                            }
-                            alt="Student Photo"
-                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          />
-                        ) : (
-                          <div className="text-center text-muted p-1">
-                            <FiCamera size={20} className="text-primary mb-1" />
-                            <small className="d-block" style={{ fontSize: "0.55rem" }}>Add</small>
-                          </div>
-                        )}
-                        {uploadingPhoto && (
-                          <div
-                            className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                            style={{ background: "rgba(0,0,0,0.6)" }}
-                          >
-                            <span className="spinner-border spinner-border-sm text-light"></span>
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1 px-2"
-                        onClick={() => photoInputRef.current?.click()}
-                        disabled={uploadingPhoto}
-                        style={{ fontSize: "0.75rem", borderColor: "rgba(255,255,255,0.15)", color: "var(--text-secondary)" }}
-                      >
-                        <FiCamera size={13} />
-                        {(user.studentProfile?.idCardImageUrl || user.idCardImageUrl) ? "Change Photo" : "Upload Photo"}
-                      </button>
+                      {(() => {
+                        const roll = (user.studentProfile?.rollNumber || "").toUpperCase();
+                        const rawPhoto =
+                          user.studentProfile?.photoUrl ||
+                          user.photoUrl ||
+                          (roll ? `/uploads/photo_${roll}.png` : null) ||
+                          user.studentProfile?.idCardImageUrl ||
+                          user.idCardImageUrl;
+                        const photoSrc = rawPhoto
+                          ? (rawPhoto.startsWith("http") || rawPhoto.startsWith("data:")
+                              ? rawPhoto
+                              : `${serverBaseUrl}${rawPhoto.startsWith('/') ? '' : '/'}${rawPhoto}`)
+                          : null;
+                        return (
+                          <>
+                            <div
+                              className="rounded-2 overflow-hidden border border-secondary shadow-sm position-relative d-flex align-items-center justify-content-center"
+                              style={{
+                                width: "56px",
+                                height: "68px",
+                                background: "rgba(255,255,255,0.05)",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => photoInputRef.current?.click()}
+                              title="Click to change candidate photo"
+                            >
+                              {photoSrc ? (
+                                <img
+                                  src={photoSrc}
+                                  alt="Student Photo"
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              ) : (
+                                <div className="text-center text-muted p-1">
+                                  <FiCamera size={20} className="text-primary mb-1" />
+                                  <small className="d-block" style={{ fontSize: "0.55rem" }}>Add</small>
+                                </div>
+                              )}
+                              {uploadingPhoto && (
+                                <div
+                                  className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                                  style={{ background: "rgba(0,0,0,0.6)" }}
+                                >
+                                  <span className="spinner-border spinner-border-sm text-light"></span>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 py-1 px-2"
+                              onClick={() => photoInputRef.current?.click()}
+                              disabled={uploadingPhoto}
+                              style={{ fontSize: "0.75rem", borderColor: "rgba(255,255,255,0.15)", color: "var(--text-secondary)" }}
+                            >
+                              <FiCamera size={13} />
+                              {photoSrc ? "Change Photo" : "Upload Photo"}
+                            </button>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                   
@@ -987,8 +1002,25 @@ const Dashboard = () => {
                     </div>
 
                     <div className="col-md-6">
-                      <small className="text-muted d-block text-uppercase" style={{ fontSize: "0.7rem" }}>Assigned Venue Center</small>
-                      <span className="fw-semibold text-light text-wrap">{user.studentProfile?.examCenter || "Refer to Venue Coordinator"}</span>
+                      <small className="text-muted d-block text-uppercase" style={{ fontSize: "0.7rem" }}>Telegram Notification Link</small>
+                      <span className="fw-semibold text-light text-wrap">
+                        {user.studentProfile?.telegramChatId ? (
+                          <span className="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50">
+                            📱 Chat ID: {user.studentProfile.telegramChatId}
+                          </span>
+                        ) : (
+                          <span className="text-muted" style={{ fontSize: "0.85rem" }}>Not provided</span>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="col-md-6">
+                      <small className="text-muted d-block text-uppercase" style={{ fontSize: "0.7rem" }}>Assigned Venue & Seating</small>
+                      <span className="fw-semibold text-light text-wrap">
+                        {user.isActive && user.studentProfile?.allocatedHall && !user.studentProfile?.allocatedHall.includes("Pending")
+                          ? `${user.studentProfile?.examCenter || "Main Campus"} [${user.studentProfile?.allocatedHall} — ${user.studentProfile?.allocatedSeat || "Desk Assigned"}]`
+                          : "🔒 Confidential (Assigned upon Admin Approval)"}
+                      </span>
                     </div>
                   </div>
 
@@ -1002,19 +1034,40 @@ const Dashboard = () => {
                     </div>
                     <div className="col-md-4 mb-2">
                       <small className="text-muted d-block fw-bold" style={{ fontSize: "0.65rem" }}>DATE & TIME</small>
-                      <span className="fw-semibold">{user.studentProfile?.examDate || "2026-08-10"}</span>
-                      <small className="d-block text-muted">{user.studentProfile?.examTime || "10:00 AM"}</small>
+                      {user.isActive && user.studentProfile?.examDate ? (
+                        <>
+                          <span className="fw-semibold text-success">{user.studentProfile.examDate}</span>
+                          <small className="d-block text-light">{user.studentProfile.examTime || "10:00 AM - 1:00 PM"}</small>
+                        </>
+                      ) : (
+                        <div>
+                          <span className="text-warning fw-semibold d-flex align-items-center gap-1" style={{ fontSize: "0.82rem" }}>
+                            <FiLock size={12} /> Confidential until Approval
+                          </span>
+                          <small className="d-block text-muted" style={{ fontSize: "0.68rem" }}>
+                            Notified via Telegram upon approval
+                          </small>
+                        </div>
+                      )}
                     </div>
                     <div className="col-md-3 text-md-end">
-                      <button
-                        className="btn btn-primary-custom btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1 mt-2 mt-md-0"
-                        onClick={() => setShowAdmitCard(true)}
-                        disabled={!user.isActive}
-                        style={!user.isActive ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-                        title={!user.isActive ? "Admit Card is locked until Admin approval" : "View Admit Card"}
-                      >
-                        <FiFileText size={14} /> Admit Card
-                      </button>
+                      {user.isActive ? (
+                        <button
+                          className="btn btn-primary-custom btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1 mt-2 mt-md-0"
+                          onClick={() => setShowAdmitCard(true)}
+                          title="View Official Admit Card / Hall Ticket"
+                        >
+                          <FiFileText size={14} /> Official Admit Card
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-outline-warning btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1 mt-2 mt-md-0"
+                          onClick={() => toast.info("🔒 Your official Admit Card, Exam Date, Room, and Time will be unlocked once approved by the Admin and sent to your Telegram.")}
+                          title="Admit Card locked until admin approval"
+                        >
+                          <FiLock size={14} /> Awaiting Approval
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1032,8 +1085,19 @@ const Dashboard = () => {
                       </div>
                       <h4 className="fw-bold text-warning">Approval Pending</h4>
                       <p className="text-secondary px-3 mt-2">
-                        Your self-registration is currently pending administrator approval. Your hall ticket (Admit Card) will be generated and downloadable here once approved.
+                        Your self-registration is currently under review by the Administrator. 
+                        To maintain strict examination security, your <strong>Exam Date</strong>, <strong>Room Number</strong>, and <strong>Time Slot</strong> will remain confidential until approved.
                       </p>
+                      <div className="p-3 rounded bg-dark border border-warning-subtle text-start mx-3 w-100 mt-2">
+                        <small className="text-warning d-block fw-bold mb-1">
+                          📱 Telegram Notification Status:
+                        </small>
+                        <small className="text-light d-block" style={{ fontSize: "0.8rem" }}>
+                          {user.studentProfile?.telegramChatId 
+                            ? `✓ Linked to Telegram: ${user.studentProfile.telegramChatId}. Your Exam Date, Room, and Time will be sent directly to your Telegram immediately upon approval!`
+                            : `⚠️ No Telegram Chat ID provided during registration. Please inform the admin to update your Telegram Chat ID.`}
+                        </small>
+                      </div>
                     </>
                   ) : verificationStatus === "APPROVED" ? (
                     <>

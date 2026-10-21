@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>BCA26022 - FATHIMA R</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+  body { background: #ffffff; padding: 0; margin: 0; width: 850px; height: 500px; }
+  
+  .id-card {
+    width: 850px;
+    height: 500px;
+    background: #ffffff;
+    border: 3px solid #1e3a8a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: #1e3a8a;
+    color: #ffffff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #f59e0b;
+  }
+
+  .header-titles h1 {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .header-titles h2 {
+    font-size: 13px;
+    color: #fef08a;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-session {
+    background: #f59e0b;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .card-body {
+    display: flex;
+    padding: 24px 28px;
+    flex: 1;
+    gap: 24px;
+    background: #ffffff;
+    align-items: center;
+  }
+
+  .photo-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .photo-frame {
+    width: 130px;
+    height: 165px;
+    border: 2px solid #000000;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-frame svg {
+    width: 100%;
+    height: 100%;
+  }
+  .id-badge-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 10px;
+    text-transform: uppercase;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 6px 0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .label-cell {
+    width: 140px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+  .value-cell {
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+  .roll-val {
+    font-size: 22px;
+    color: #000000;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  .qr-col {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 14px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .qr-box {
+    background: #ffffff;
+    padding: 6px;
+    border: 2px solid #000000;
+  }
+  .qr-box img {
+    display: block;
+    width: 120px;
+    height: 120px;
+  }
+  .qr-code-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .card-footer {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 2px solid #cbd5e1;
+  }
+  .signature-text {
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 16px;
+    color: #1e3a8a;
+  }
+</style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="card-header">
+      <div class="header-titles">
+        <h1>STATE TECHNOLOGICAL UNIVERSITY</h1>
+        <h2>OFFICIAL STUDENT IDENTITY CARD</h2>
+      </div>
+      <div class="badge-session">VALID: 2025 - 2027</div>
+    </div>
+    <div class="card-body">
+      <div class="photo-col">
+        <div class="photo-frame">
+          <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+      <rect width="100" height="120" fill="#4f46e5"/>
+      <path d="M 25 45 Q 25 15 50 15 Q 75 15 75 45 Q 82 85 75 105 Q 50 95 25 105 Q 18 85 25 45 Z" fill="#312e81"/>
+      <circle cx="50" cy="48" r="16" fill="#fed7aa"/>
+      <path d="M 22 110 Q 22 76 50 76 Q 78 76 78 110 Z" fill="#4338ca"/>
+      <polygon points="45,76 55,76 53,95 50,98 47,95" fill="#f43f5e"/>
+    
+          </svg>
+        </div>
+        <div class="id-badge-tag">REGULAR STUDENT</div>
+      </div>
+      <div class="details-col">
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">STUDENT NAME:</td>
+            <td class="value-cell">FATHIMA R</td>
+          </tr>
+          <tr>
+            <td class="label-cell">ROLL NUMBER:</td>
+            <td class="value-cell roll-val">BCA26022</td>
+          </tr>
+          <tr>
+            <td class="label-cell">COURSE:</td>
+            <td class="value-cell">BCA (SEMESTER 4)</td>
+          </tr>
+          <tr>
+            <td class="label-cell">DATE OF BIRTH:</td>
+            <td class="value-cell">2002-09-09</td>
+          </tr>
+          <tr>
+            <td class="label-cell">AADHAAR / ID NO:</td>
+            <td class="value-cell">7890 1234 5678</td>
+          </tr>
+          <tr>
+            <td class="label-cell">BLOOD GROUP:</td>
+            <td class="value-cell">A+ | VALIDITY: 31-07-2027</td>
+          </tr>
+        </table>
+      </div>
+      <div class="qr-col">
+        <div class="qr-box">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAYAAACuwEE+AAAAAklEQVR4AewaftIAAANCSURBVO3BQW4YBxIEwazG/P/LuYIPe2oKbmFokURFxF+o+peGqoOh6mCoOhiqDoaqg6Hq4OE3kvAdqLwhCR9ReUMSvgOVzVB1MFQdDFUHQ9XBUHXw8AdU/oYkXCRho7JRuUrCRuVC5W9IwsVQdTBUHQxVB0PVwVB18PCiJLxB5Q0qmyS8ReUzJeENKm8Yqg6GqoOh6mCoOhiqDh7q/1SukrBR+YmGqoOh6mCoOhiqDoaqg4cfLAn1rqHqYKg6GKoOhqqDoerg4UUqX4nKJgnfhcpXMlQdDFUHQ9XBUHUwVB08/IEkfAdJ2KhskvARlc+UhO9gqDoYqg6GqoOh6mCoOoi/UP9IwltUfqKh6mCoOhiqDoaqg6Hq4OE3krBR2SRho7JJwkZlk4SNykUSNiofScJG5TMlYaNykYSNysVQdTBUHQxVB0PVwVB18PAfSMJG5ULlMyXhLUnYqGySsFHZJGGjslHZJGGjshmqDoaqg6HqYKg6GKoOHv4DKpskbFQ2SXiDyiYJH1HZJGGjsknCRmWThDck4Q1D1cFQdTBUHQxVB0PVwVB1EH/hkyVho/KGJLxB5SNJ2Ki8IQkblU0SLlTeMFQdDFUHQ9XBUHUwVB08/EYS3qCyScJGZZOEjcpFEjZJ+IjKJgkblU0SNiqbJFyofKah6mCoOhiqDoaqg6HqIP7CD5WEjcomCVcqmyRsVDZJeIPKJgkXKpuh6mCoOhiqDoaqg6Hq4OE3kvAdqGxUNkm4UtkkYaPyNyRho7JJwsVQdTBUHQxVB0PVwVB18PAHVP6GJLxBZZOEjyThIgkblQuViyRcqFwMVQdD1cFQdTBUHQxVBw8vSsIbVN6QhI3KRuUjSbhQ2SRho7JJwlcyVB0MVQdD1cFQdTBUHTz8YCqbJGxUrlS+EpVNEjYqF0PVwVB1MFQdDFUHQ9XBww+WhLeobJKwUflMKpskbFQ2SdiobIaqg6HqYKg6GKoOhqqDhxepfCUqmyS8RWWThI3KhcomCRuVTRLeMFQdDFUHQ9XBUHUwVB08/IEkfAdJuEjClcpG5Q1JuEjCRmWThIuh6mCoOhiqDoaqg6HqIP5C1b80VB0MVQdD1cFQdTBUHfwPXfcpJ+TGL7QAAAAASUVORK5CYII=" alt="QR">
+        </div>
+        <div class="qr-code-text">EXAM-BCA26022-2026</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>CARD ID: ID-2026-BCA26022</span>
+      <span>HOLDER SIGN: <span class="signature-text">FATHIMA</span></span>
+      <span>REGISTRAR: <span class="signature-text">Dr. K. S. Pillai</span></span>
+    </div>
+  </div>
+</body>
+</html>

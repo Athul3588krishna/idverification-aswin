@@ -198,6 +198,7 @@ const registerUser = asyncHandler(async (req, res) => {
       examSubject: examSubject || "Entrance Examination 2026",
       examDate: examDate || "2026-08-15",
       examTime: examTime || "10:00 AM - 1:00 PM",
+      photoUrl: req.file ? `/uploads/${req.file.filename}` : null,
       idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
     };
   }
@@ -442,6 +443,45 @@ const updateUserStatus = asyncHandler(async (req, res) => {
   }
 
   user.isActive = isActive;
+
+  // When admin approves/activates a student candidate, allocate exam date, time, hall, and desk if not already assigned
+  if (isActive && user.role === "student") {
+    if (!user.studentProfile) user.studentProfile = {};
+    user.studentProfile.adminVerified = true;
+    user.studentProfile.adminVerifiedAt = new Date();
+
+    if (!user.studentProfile.examDate || user.studentProfile.examDate.includes("Pending")) {
+      user.studentProfile.examDate = "2026-08-10";
+    }
+
+    if (!user.studentProfile.examTime || user.studentProfile.examTime.includes("Pending")) {
+      user.studentProfile.examTime = "10:00 AM - 1:00 PM";
+    }
+
+    if (!user.studentProfile.allocatedHall || user.studentProfile.allocatedHall.includes("Pending")) {
+      const halls = [
+        "Block A - Room 101",
+        "Block A - Room 102",
+        "Block B - Room 201",
+        "Block B - Room 204",
+        "Block C - Room 301",
+        "Block C - Room 302",
+        "Block D - Room 401",
+        "Lab 1 - Ground Floor",
+        "Lab 2 - First Floor"
+      ];
+      user.studentProfile.allocatedHall = halls[Math.floor(Math.random() * halls.length)];
+    }
+
+    if (!user.studentProfile.allocatedSeat || user.studentProfile.allocatedSeat.includes("Pending")) {
+      user.studentProfile.allocatedSeat = `Desk #${Math.floor(Math.random() * 30) + 1}`;
+    }
+
+    if (!user.studentProfile.examCenter || user.studentProfile.examCenter.includes("Pending")) {
+      user.studentProfile.examCenter = "State University Main Examination Complex";
+    }
+  }
+
   await user.save({ validateBeforeSave: false });
 
   // Emit real-time status update via Socket.io
@@ -451,15 +491,58 @@ const updateUserStatus = asyncHandler(async (req, res) => {
       userId: user._id,
       email: user.email,
       isActive: user.isActive,
+      allocatedHall: user.studentProfile?.allocatedHall,
+      allocatedSeat: user.studentProfile?.allocatedSeat,
+      examDate: user.studentProfile?.examDate,
+      examTime: user.studentProfile?.examTime,
       user: user.toPublicJSON()
     });
   } catch (err) {
     console.error("Socket emit error:", err.message);
   }
 
+  // Send candidate approval notification via Telegram & Email
+  if (isActive && user.role === "student") {
+    // 1. Telegram Notification (notifies student of Exam Date, Room, Time, Desk)
+    try {
+      const { sendTelegramApprovalNotification } = require("../utils/telegram");
+      sendTelegramApprovalNotification({
+        chatId: user.studentProfile?.telegramChatId,
+        studentName: user.name,
+        rollNumber: user.studentProfile?.rollNumber || "N/A",
+        course: user.studentProfile?.course,
+        examSubject: user.studentProfile?.examSubject || "Entrance Examination 2026",
+        examDate: user.studentProfile?.examDate || "2026-08-10",
+        examTime: user.studentProfile?.examTime || "10:00 AM - 1:00 PM",
+        allocatedHall: user.studentProfile?.allocatedHall || "Block B - Room 204",
+        allocatedSeat: user.studentProfile?.allocatedSeat || "Desk #18",
+        examCenter: user.studentProfile?.examCenter || "State University Main Examination Complex"
+      }).catch((err) => console.warn("[Telegram Notification Error]:", err.message));
+    } catch (err) {
+      console.warn("[Telegram Notification Setup Error]:", err.message);
+    }
+
+    // 2. Email Notification
+    try {
+      const { sendApprovalEmail } = require("../utils/mailer");
+      sendApprovalEmail(
+        user.email,
+        user.name,
+        user.studentProfile?.rollNumber || "N/A",
+        user.studentProfile?.allocatedHall || "Block B - Room 204",
+        user.studentProfile?.allocatedSeat || "Desk #18",
+        user.studentProfile?.examSubject
+      ).catch((err) => console.warn("[Approval Email Error]:", err.message));
+    } catch (err) {
+      console.warn("[Approval Email Setup Error]:", err.message);
+    }
+  }
+
   res.status(200).json({
     success: true,
-    message: `Account has been ${isActive ? "activated" : "deactivated"}`,
+    message: isActive
+      ? `Candidate approved! Hall (${user.studentProfile?.allocatedHall || "Block B"}), ${user.studentProfile?.allocatedSeat || "Desk #18"}, and exam schedule sent via Telegram & Email.`
+      : "Candidate account has been deactivated / barred.",
     user: user.toPublicJSON(),
   });
 });
@@ -571,26 +654,55 @@ const studentRegister = asyncHandler(async (req, res) => {
     throw new Error(`Roll number '${rollNumber}' is already registered`);
   }
 
+  const { getAutoApprove } = require("../utils/systemConfig");
+  const isAutoApproved = getAutoApprove();
+
+  // Handle uploaded files: studentPhoto (for Admit Card) and idCardImage (for OCR & verification)
+  const files = req.files || (req.file ? [req.file] : []);
+  const studentPhotoFile = files.find(
+    (f) => f.fieldname === "studentPhoto" || f.fieldname === "photo"
+  );
+  const idCardFile = files.find(
+    (f) => f.fieldname === "idCardImage" || f.fieldname === "idCard"
+  );
+
+  const cleanRoll = rollNumber.toUpperCase();
+  const fs = require("fs");
+  const path = require("path");
+  const samplePhotoPath = path.join(__dirname, `../uploads/photo_${cleanRoll}.png`);
+  const hasSamplePhoto = fs.existsSync(samplePhotoPath);
+
+  const photoUrl = studentPhotoFile
+    ? `/uploads/${studentPhotoFile.filename}`
+    : (hasSamplePhoto
+        ? `/uploads/photo_${cleanRoll}.png`
+        : (idCardFile ? `/uploads/${idCardFile.filename}` : null));
+
+  const idCardImageUrl = idCardFile
+    ? `/uploads/${idCardFile.filename}`
+    : (studentPhotoFile ? `/uploads/${studentPhotoFile.filename}` : null);
+
   const studentProfile = {
-    rollNumber: rollNumber.toUpperCase(),
+    rollNumber: cleanRoll,
     course,
     semester: Math.min(Math.max(Number(semester) || 1, 1), 20),
     dob,
     idNumber,
+    telegramChatId: req.body.telegramChatId ? req.body.telegramChatId.trim() : "",
     examSubject: examSubject || "Entrance Examination 2026",
-    examDate: examDate || "2026-08-15",
-    examTime: examTime || "10:00 AM - 1:00 PM",
-    examCenter: examCenter || "Hall A - Room 101",
-    allocatedHall: req.body.allocatedHall || "Block B - Room 204",
-    allocatedSeat: req.body.allocatedSeat || `Desk #${Math.floor(Math.random() * 30) + 1}`,
+    examDate: isAutoApproved ? (examDate || "2026-08-10") : "",
+    examTime: isAutoApproved ? (examTime || "10:00 AM - 1:00 PM") : "",
+    examCenter: examCenter || "Main University Campus",
+    allocatedHall: isAutoApproved ? (req.body.allocatedHall || "Block B - Room 204") : "",
+    allocatedSeat: isAutoApproved ? (req.body.allocatedSeat || `Desk #${Math.floor(Math.random() * 30) + 1}`) : "",
+    adminVerified: isAutoApproved,
+    adminVerifiedAt: isAutoApproved ? new Date() : null,
     checkInStatus: "NOT_ARRIVED",
     checkInTime: null,
-    qrToken: `EXAM-${rollNumber.toUpperCase()}-2026`,
-    idCardImageUrl: req.file ? `/uploads/${req.file.filename}` : null
+    qrToken: `EXAM-${cleanRoll}-2026`,
+    photoUrl,
+    idCardImageUrl
   };
-
-  const { getAutoApprove } = require("../utils/systemConfig");
-  const isAutoApproved = getAutoApprove();
 
   const user = await User.create({
     name,
@@ -618,7 +730,7 @@ const studentRegister = asyncHandler(async (req, res) => {
     success: true,
     message: isAutoApproved
       ? "Registration successful! Account automatically approved. Log in to access your admit card."
-      : "Registration successful! Pending Admin approval to download hall ticket.",
+      : "Registration successful! Pending Admin approval. Your Exam Date, Room, and Time will be notified via Telegram upon approval.",
     user: user.toPublicJSON(),
   });
 });
@@ -682,6 +794,7 @@ const uploadStudentPhoto = asyncHandler(async (req, res) => {
   if (!user.studentProfile) {
     user.studentProfile = {};
   }
+  user.studentProfile.photoUrl = photoUrl;
   user.studentProfile.idCardImageUrl = photoUrl;
   await user.save({ validateBeforeSave: false });
 
@@ -691,6 +804,44 @@ const uploadStudentPhoto = asyncHandler(async (req, res) => {
     photoUrl,
     user: user.toPublicJSON(),
   });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// @desc    Extract student details from uploaded ID card using OCR
+// @route   POST /api/auth/extract-id
+// @access  Public
+// ═══════════════════════════════════════════════════════════════
+const extractIdCardDetails = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("Please select an ID card image to scan");
+  }
+
+  const { performOCR, parseIdCardText } = require("../utils/ocrUtils");
+  const fs = require("fs");
+
+  try {
+    const rawText = await performOCR(req.file.path);
+    const extracted = parseIdCardText(rawText);
+
+    // Clean up temporary scan file to preserve disk space
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.warn("[OCR Cleanup] Could not remove temp file:", err.message);
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "ID Card text extracted successfully",
+      extracted,
+      rawTextLength: rawText.length,
+    });
+  } catch (error) {
+    if (req.file && req.file.path) {
+      fs.unlink(req.file.path, () => {});
+    }
+    res.status(500);
+    throw new Error(`OCR Extraction failed: ${error.message}`);
+  }
 });
 
 // ── Export all controller functions ──
@@ -707,4 +858,5 @@ module.exports = {
   updateUserStatus,
   deleteUser,
   uploadStudentPhoto,
+  extractIdCardDetails,
 };
