@@ -62,7 +62,7 @@ const verifyStudentCard = asyncHandler(async (req, res) => {
     scannedName = matchedStudent.name;
 
     // Compute weighted match percentage
-    let score = 40; // Roll Number matched! (40%)
+    let score = 50; // Roll Number matched! (40%)
 
     // Name Match (20%)
     const cleanName = matchedStudent.name.toUpperCase().replace(/[\s\-_]/g, "");
