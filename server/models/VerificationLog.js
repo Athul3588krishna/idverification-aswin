@@ -57,6 +57,7 @@ const verificationLogSchema = new mongoose.Schema(
       required: true,
       min: 0,
       max: 100,
+      set: (v) => Math.min(100, Math.max(0, Math.round(Number(v) || 0))),
       default: 0
     },
 

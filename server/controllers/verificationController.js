@@ -10,7 +10,6 @@ const User = require("../models/User");
 const { performOCR } = require("../utils/ocrUtils");
 
 // ═══════════════════════════════════════════════════════════════
-// @desc    Process ID Card Upload and Perform OCR Matching
 // @route   POST /api/verify/scan
 // @access  Private — Security Staff & Admin
 // ═══════════════════════════════════════════════════════════════
@@ -61,8 +60,8 @@ const verifyStudentCard = asyncHandler(async (req, res) => {
     scannedRollNumber = matchedStudent.studentProfile.rollNumber;
     scannedName = matchedStudent.name;
 
-    // Compute weighted match percentage
-    let score = 50; // Roll Number matched! (40%)
+    // Compute weighted match percentage (Roll: 40%, Name: 20%, DOB: 20%, ID/Aadhaar: 20%)
+    let score = 40; // Roll Number matched! (40%)
 
     // Name Match (20%)
     const cleanName = matchedStudent.name.toUpperCase().replace(/[\s\-_]/g, "");
@@ -86,7 +85,7 @@ const verifyStudentCard = asyncHandler(async (req, res) => {
       }
     }
 
-    matchPercentage = score;
+    matchPercentage = Math.min(100, Math.max(0, score));
 
     // ── Step 3: Anti-Passback Duplicate Entry Check ──
     if (matchedStudent.studentProfile && matchedStudent.studentProfile.checkInStatus === "CHECKED_IN") {
