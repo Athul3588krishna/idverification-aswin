@@ -10,8 +10,7 @@ const User = require("../models/User");
 const { performOCR } = require("../utils/ocrUtils");
 
 // ═══════════════════════════════════════════════════════════════
-// @route   POST /api/verify/scan
-// @access  Private — Security Staff & Admin
+// 
 // ═══════════════════════════════════════════════════════════════
 const verifyStudentCard = asyncHandler(async (req, res) => {
   // Ensure file is uploaded
